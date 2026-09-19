@@ -1,6 +1,6 @@
 'use client';
 
-import { useId } from 'react';
+import { useId, useMemo } from 'react';
 import type { FC } from 'react';
 import {
     Area,
@@ -33,13 +33,24 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
+// Module-level cache to eliminate repeated Date object instantiations and
+// toLocaleDateString calls for identical month key strings ("YYYY-MM").
+const monthLabelCache = new Map<string, string>();
+
 function formatMonthLabel(monthKey: string): string {
+    const cached = monthLabelCache.get(monthKey);
+    if (cached !== undefined) {
+        return cached;
+    }
+
     const [y, m] = monthKey.split('-');
     const date = new Date(Number(y), Number(m) - 1);
-    return date.toLocaleDateString('en-US', {
+    const formatted = date.toLocaleDateString('en-US', {
         month: 'short',
         year: '2-digit',
     });
+    monthLabelCache.set(monthKey, formatted);
+    return formatted;
 }
 
 interface TooltipPayload {
@@ -112,11 +123,29 @@ const DashboardIncomeExpenseChart: FC<DashboardIncomeExpenseChartProps> = ({
     // the first one's <defs>.
     const gradientId = useId();
 
-    const chartData = data.map((d) => ({
-        ...d,
-        monthLabel: formatMonthLabel(d.month),
-        incomeArea: d.income,
-    }));
+    // Memoize chartData transformation to prevent redundant array object allocations
+    // and Date formatting on re-renders (e.g. parent state updates or hover interactions).
+    const chartData = useMemo(() => {
+        return data.map((d) => ({
+            ...d,
+            monthLabel: formatMonthLabel(d.month),
+            incomeArea: d.income,
+        }));
+    }, [data]);
+
+    // Memoize yDomain calculation to avoid recalculating max bounds on every render.
+    const yDomain = useMemo<[number, number]>(() => {
+        if (chartData.length === 0) {
+            return [0, 1];
+        }
+
+        const maxValue = Math.max(
+            ...chartData.flatMap((d) => [d.income, d.expenses]),
+            1,
+        );
+        const padding = Math.ceil(maxValue * 0.1);
+        return [0, maxValue + padding];
+    }, [chartData]);
 
     if (chartData.length === 0) {
         return (
@@ -134,13 +163,6 @@ const DashboardIncomeExpenseChart: FC<DashboardIncomeExpenseChartProps> = ({
             </Card>
         );
     }
-
-    const maxValue = Math.max(
-        ...chartData.flatMap((d) => [d.income, d.expenses]),
-        1,
-    );
-    const padding = Math.ceil(maxValue * 0.1);
-    const yDomain = [0, maxValue + padding] as [number, number];
 
     return (
         <Card>
