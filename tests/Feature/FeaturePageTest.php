@@ -45,4 +45,9 @@ class FeaturePageTest extends TestCase
     {
         $this->get('/features/does-not-exist')->assertNotFound();
     }
+
+    public function test_dot_notation_key_traversal_returns_not_found(): void
+    {
+        $this->get('/features/bank-sync.highlights')->assertNotFound();
+    }
 }
