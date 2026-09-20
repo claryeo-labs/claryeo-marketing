@@ -166,9 +166,10 @@ const SiteNav: FC<SiteNavProps> = ({
             <button
                 type="button"
                 aria-expanded={openMenu === key}
+                aria-controls={`${key}-mega-menu`}
                 onClick={() => setOpenMenu((v) => (v === key ? null : key))}
                 className={cn(
-                    'flex items-center gap-1 text-sm transition-colors',
+                    'flex items-center gap-1 rounded-md text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                     isDark
                         ? openMenu === key
                             ? 'text-paper'
@@ -273,6 +274,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Features mega-menu */}
             {openMenu === 'features' && featureItems.length > 0 && (
                 <div
+                    id="features-mega-menu"
                     className={panelClass}
                     onMouseEnter={() => open('features')}
                     onMouseLeave={scheduleClose}
@@ -326,6 +328,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Resources mega-menu */}
             {openMenu === 'resources' && columns.length > 0 && (
                 <div
+                    id="resources-mega-menu"
                     className={panelClass}
                     onMouseEnter={() => open('resources')}
                     onMouseLeave={scheduleClose}
