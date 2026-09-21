@@ -29,6 +29,14 @@ class CaptureUtmParameters
     ];
 
     /**
+     * Performance optimization: Cache the flipped key lookup map in memory.
+     * Avoids re-flipping $ALL_KEYS array on every request executing this middleware.
+     *
+     * @var array<string, int>|null
+     */
+    private static ?array $flippedKeys = null;
+
+    /**
      * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
@@ -79,7 +87,11 @@ class CaptureUtmParameters
      */
     private static function extractAndNormalize(array $values): array
     {
-        $tracked = array_intersect_key($values, array_flip(self::ALL_KEYS));
+        // Performance optimization: Reuse static flipped array map to avoid
+        // allocating and flipping self::ALL_KEYS on every middleware pass.
+        self::$flippedKeys ??= array_flip(self::ALL_KEYS);
+
+        $tracked = array_intersect_key($values, self::$flippedKeys);
 
         $normalized = [];
 
