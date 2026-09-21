@@ -166,6 +166,7 @@ const SiteNav: FC<SiteNavProps> = ({
             <button
                 type="button"
                 aria-expanded={openMenu === key}
+                aria-controls={`nav-menu-${key}`}
                 onClick={() => setOpenMenu((v) => (v === key ? null : key))}
                 className={cn(
                     'flex items-center gap-1 text-sm transition-colors',
@@ -253,6 +254,8 @@ const SiteNav: FC<SiteNavProps> = ({
                     <button
                         type="button"
                         onClick={() => setMobileOpen((v) => !v)}
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-nav-menu"
                         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
                         className={cn(
                             'inline-flex items-center justify-center rounded-full border p-2.5 transition-colors md:hidden',
@@ -273,6 +276,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Features mega-menu */}
             {openMenu === 'features' && featureItems.length > 0 && (
                 <div
+                    id="nav-menu-features"
                     className={panelClass}
                     onMouseEnter={() => open('features')}
                     onMouseLeave={scheduleClose}
@@ -326,6 +330,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Resources mega-menu */}
             {openMenu === 'resources' && columns.length > 0 && (
                 <div
+                    id="nav-menu-resources"
                     className={panelClass}
                     onMouseEnter={() => open('resources')}
                     onMouseLeave={scheduleClose}
@@ -400,6 +405,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Mobile sheet */}
             {mobileOpen && (
                 <div
+                    id="mobile-nav-menu"
                     className={cn(
                         'absolute inset-x-0 top-full max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b px-4 pb-8 shadow-2xl md:hidden',
                         isDark
