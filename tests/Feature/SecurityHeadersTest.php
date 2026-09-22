@@ -13,6 +13,7 @@ class SecurityHeadersTest extends TestCase
         $response->assertOk();
         $response->assertHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
+        $response->assertHeader('Content-Security-Policy', "frame-ancestors 'self'");
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
