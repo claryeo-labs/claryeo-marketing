@@ -166,6 +166,8 @@ const SiteNav: FC<SiteNavProps> = ({
             <button
                 type="button"
                 aria-expanded={openMenu === key}
+                aria-haspopup="true"
+                aria-controls={`${key}-menu-panel`}
                 onClick={() => setOpenMenu((v) => (v === key ? null : key))}
                 className={cn(
                     'flex items-center gap-1 text-sm transition-colors',
@@ -273,6 +275,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Features mega-menu */}
             {openMenu === 'features' && featureItems.length > 0 && (
                 <div
+                    id="features-menu-panel"
                     className={panelClass}
                     onMouseEnter={() => open('features')}
                     onMouseLeave={scheduleClose}
@@ -326,6 +329,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Resources mega-menu */}
             {openMenu === 'resources' && columns.length > 0 && (
                 <div
+                    id="resources-menu-panel"
                     className={panelClass}
                     onMouseEnter={() => open('resources')}
                     onMouseLeave={scheduleClose}
