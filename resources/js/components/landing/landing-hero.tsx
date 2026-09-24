@@ -135,7 +135,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                 <div data-hero-in className="mt-8 flex flex-wrap items-center justify-center gap-4">
                     <a
                         href={waitlistMode ? waitlistUrl : getStartedUrl}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink shadow-lg transition-transform hover:scale-[1.02]"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink shadow-lg transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper/80"
                     >
                         {waitlistMode ? 'Join the waitlist' : 'Get started free'}
                         <ArrowUpRight className="size-4" />
@@ -143,7 +143,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                     {!waitlistMode && (
                         <a
                             href={waitlistUrl}
-                            className="text-sm text-mist underline-offset-4 hover:text-paper hover:underline"
+                            className="rounded-full text-sm text-mist underline-offset-4 hover:text-paper hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper/80"
                         >
                             Join the waitlist
                         </a>
@@ -153,7 +153,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                 <form
                     data-hero-in
                     onSubmit={handleSubmit}
-                    className="mt-10 flex w-full max-w-md items-center gap-2 rounded-full border border-paper/15 bg-paper/5 py-1.5 pr-1.5 pl-5 backdrop-blur"
+                    className="mt-10 flex w-full max-w-md items-center gap-2 rounded-full border border-paper/15 bg-paper/5 py-1.5 pr-1.5 pl-5 backdrop-blur transition-all focus-within:border-paper/40 focus-within:ring-2 focus-within:ring-paper/50"
                 >
                     <span className="text-mist">₦</span>
                     <input
@@ -169,7 +169,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                     <button
                         type="submit"
                         aria-label="Estimate my tax"
-                        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-paper text-ink transition-transform hover:scale-105"
+                        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-paper text-ink transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper/80"
                     >
                         <ArrowUp className="size-4" />
                     </button>
