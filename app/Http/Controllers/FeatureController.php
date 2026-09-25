@@ -72,9 +72,12 @@ class FeatureController extends Controller
      */
     public function show(string $slug): View
     {
-        $feature = config("feature_pages.{$slug}");
+        /** @var array<string, array<string, mixed>> $featurePages */
+        $featurePages = Config::array('feature_pages', []);
 
-        abort_if(! is_array($feature), Response::HTTP_NOT_FOUND);
+        abort_unless(array_key_exists($slug, $featurePages), Response::HTTP_NOT_FOUND);
+
+        $feature = $featurePages[$slug];
         /** @var array{title: string, heroParagraph: string, slug: string} $feature */
         $waitlistMode = (bool) config('marketing.waitlist_mode');
         $cta = $waitlistMode
