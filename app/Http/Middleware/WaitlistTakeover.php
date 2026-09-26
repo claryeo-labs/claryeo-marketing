@@ -96,6 +96,11 @@ class WaitlistTakeover
     {
         $query = $request->getQueryString();
 
-        return redirect()->to($query ? $path.'?'.$query : $path);
+        // Built from the request, not the URL generator: in production the
+        // generator can hold an http scheme cached before TrustProxies ran, which
+        // sent every takeover redirect through an extra http:// hop.
+        $url = $request->getSchemeAndHttpHost().rtrim($path, '/');
+
+        return redirect()->away($query ? $url.'?'.$query : $url);
     }
 }
