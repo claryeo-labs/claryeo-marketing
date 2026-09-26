@@ -51,6 +51,18 @@ class WaitlistModeTest extends TestCase
         $this->get($path)->assertStatus(302)->assertRedirect('/');
     }
 
+    public function test_waitlist_mode_redirect_keeps_https_behind_the_edge_proxy(): void
+    {
+        config()->set('marketing.waitlist_mode', true);
+
+        $response = $this->withServerVariables(['REMOTE_ADDR' => '10.0.0.1'])
+            ->withHeaders(['X-Forwarded-Proto' => 'https', 'X-Forwarded-Host' => 'claryeo.com'])
+            ->get('http://claryeo.com/pricing');
+
+        $response->assertStatus(302);
+        $this->assertStringStartsWith('https://', (string) $response->headers->get('Location'));
+    }
+
     public function test_waitlist_mode_redirect_keeps_the_query_string_for_attribution(): void
     {
         config()->set('marketing.waitlist_mode', true);
