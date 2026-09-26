@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { memo } from 'react';
 
 import {
     Accordion,
@@ -21,11 +22,15 @@ export type FaqTone = 'light' | 'ink';
  * posts render inside .prose-claryeo, which otherwise styles the <h3> Radix
  * wraps every trigger in and blows the list apart with heading margins.
  */
+/**
+ * Prevent unnecessary re-renders of the static FAQ accordion subtree during state updates
+ * in parent components (e.g. interactive forms like TaxCalculatorPage).
+ */
 export const FaqAccordion: FC<{
     items: FaqItem[];
     className?: string;
     tone?: FaqTone;
-}> = ({ items, className, tone = 'light' }) => (
+}> = memo(({ items, className, tone = 'light' }) => (
     <Accordion
         type="single"
         collapsible
@@ -56,7 +61,9 @@ export const FaqAccordion: FC<{
             </AccordionItem>
         ))}
     </Accordion>
-);
+));
+
+FaqAccordion.displayName = 'FaqAccordion';
 
 /** Standalone FAQ section: eyebrow, heading, blurb, accordion. */
 const FaqSection: FC<{
@@ -68,7 +75,7 @@ const FaqSection: FC<{
     className?: string;
     tone?: FaqTone;
     children?: ReactNode;
-}> = ({
+}> = memo(({
     items,
     eyebrow = 'Questions',
     heading,
@@ -124,6 +131,8 @@ const FaqSection: FC<{
             {children}
         </div>
     </section>
-);
+));
+
+FaqSection.displayName = 'FaqSection';
 
 export default FaqSection;
