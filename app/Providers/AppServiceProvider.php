@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\View\Composers\BlogIndexComposer;
 use App\Services\MainApi;
+use App\Support\SiteMode;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -11,6 +12,9 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /** @var array<int, array<string, mixed>> */
+    private array $modeViewData = [];
+
     /**
      * Register any application services.
      */
@@ -40,18 +44,6 @@ class AppServiceProvider extends ServiceProvider
          * } $nav
          */
         $nav = Config::array('marketing_nav');
-        $waitlistMode = (bool) config('marketing.waitlist_mode');
-
-        $primaryCta = $waitlistMode
-            ? ['label' => 'Join the waitlist', 'href' => '/waitlist']
-            : ['label' => 'Get started', 'href' => '/get-started'];
-
-        // In waitlist mode, pricing/get-started are hidden everywhere.
-        $hidden = $waitlistMode ? ['/pricing', '/get-started'] : [];
-        $primaryLinks = array_values(array_filter(
-            $nav['primary'] ?? [],
-            static fn (array $link): bool => ! in_array($link['href'], $hidden, true),
-        ));
 
         // Features mega-menu, built from the individual feature pages.
         /** @var array<string, array<string, mixed>> $featurePages */
@@ -109,42 +101,16 @@ class AppServiceProvider extends ServiceProvider
         View::share('posthog_host', config('services.posthog.host'));
 
         View::share('claryeo_app_url', $appUrl);
-        View::share('waitlist_mode', $waitlistMode);
-        View::share('primary_cta', $primaryCta);
         // Header chrome: 'dark' lets a page sit the header over a full-bleed
         // dark hero (landing only); everything else keeps the solid header.
         View::share('nav_theme', 'light');
 
-        // JSON props for the header island (Features + Resources mega-menus).
-        View::share('nav_props', htmlspecialchars(
-            (string) json_encode([
-                'appUrl' => $appUrl,
-                'primary' => $primaryLinks,
-                'features' => $features,
-                'resources' => $nav['resources'] ?? [],
-                'waitlistMode' => $waitlistMode,
-                'cta' => $primaryCta,
-            ]),
-            ENT_QUOTES,
-            'UTF-8'
-        ));
-
-        // JSON props for the closing-CTA island (partials/cta). Copy is passed
-        // as data attributes by the partial; only the links come from here.
-        View::share('cta_props', htmlspecialchars(
-            (string) json_encode([
-                'primary' => $primaryCta,
-                'secondary' => $waitlistMode
-                    ? null
-                    : ['label' => 'Join the waitlist', 'href' => '/waitlist'],
-            ]),
-            ENT_QUOTES,
-            'UTF-8'
-        ));
-
-        // Arrays for the server-rendered Antlers footer + nav fallback.
-        View::share('nav_primary', $primaryLinks);
-        View::share('footer_groups', $this->footerGroups($nav['footer'] ?? [], $waitlistMode));
+        // Nav, CTA and footer data depend on waitlist mode, which is resolved
+        // per request (App\Support\SiteMode reads the main app's switch), so
+        // it is attached at render time rather than frozen into boot().
+        View::composer('*', function ($view) use ($appUrl, $nav, $features): void {
+            $view->with($this->modeViewData($appUrl, $nav, $features));
+        });
         View::share('footer_socials', $nav['social'] ?? []);
 
         // Blog category chips. Antlers can't iterate an associative array as
@@ -157,6 +123,73 @@ class AppServiceProvider extends ServiceProvider
 
         // Popularity-ranked "Top Reads" for the blog index.
         View::composer('blog.index', BlogIndexComposer::class);
+    }
+
+    /**
+     * View data that varies with waitlist mode, memoised per mode.
+     *
+     * @param  array{primary?: list<array{label: string, href: string}>, resources?: mixed, footer?: array<int, array{group: string, items: array<int, array{title: string, href: string}>}>, social?: mixed}  $nav
+     * @param  array<string, mixed>  $features
+     * @return array<string, mixed>
+     */
+    private function modeViewData(string $appUrl, array $nav, array $features): array
+    {
+        $waitlistMode = $this->app->make(SiteMode::class)->waitlist();
+
+        return $this->modeViewData[$waitlistMode ? 1 : 0] ??= $this->buildModeViewData($waitlistMode, $appUrl, $nav, $features);
+    }
+
+    /**
+     * @param  array{primary?: list<array{label: string, href: string}>, resources?: mixed, footer?: array<int, array{group: string, items: array<int, array{title: string, href: string}>}>, social?: mixed}  $nav
+     * @param  array<string, mixed>  $features
+     * @return array<string, mixed>
+     */
+    private function buildModeViewData(bool $waitlistMode, string $appUrl, array $nav, array $features): array
+    {
+        $primaryCta = $waitlistMode
+            ? ['label' => 'Join the waitlist', 'href' => '/quiz']
+            : ['label' => 'Get started', 'href' => '/get-started'];
+
+        // In waitlist mode, pricing/get-started are hidden everywhere.
+        $hidden = $waitlistMode ? ['/pricing', '/get-started'] : [];
+        $primaryLinks = array_values(array_filter(
+            $nav['primary'] ?? [],
+            static fn (array $link): bool => ! in_array($link['href'], $hidden, true),
+        ));
+
+        return [
+            'waitlist_mode' => $waitlistMode,
+            'primary_cta' => $primaryCta,
+
+            // JSON props for the header island (Features + Resources mega-menus).
+            'nav_props' => htmlspecialchars(
+                (string) json_encode([
+                    'appUrl' => $appUrl,
+                    'primary' => $primaryLinks,
+                    'features' => $features,
+                    'resources' => $nav['resources'] ?? [],
+                    'waitlistMode' => $waitlistMode,
+                    'cta' => $primaryCta,
+                ]),
+                ENT_QUOTES,
+                'UTF-8'
+            ),
+
+            // JSON props for the closing-CTA island (partials/cta). Copy is passed
+            // as data attributes by the partial; only the links come from here.
+            'cta_props' => htmlspecialchars(
+                (string) json_encode([
+                    'primary' => $primaryCta,
+                    'secondary' => null,
+                ]),
+                ENT_QUOTES,
+                'UTF-8'
+            ),
+
+            // Arrays for the server-rendered Antlers footer + nav fallback.
+            'nav_primary' => $primaryLinks,
+            'footer_groups' => $this->footerGroups($nav['footer'] ?? [], $waitlistMode),
+        ];
     }
 
     /**
@@ -179,7 +212,7 @@ class AppServiceProvider extends ServiceProvider
             ));
 
             if ($group['group'] === 'Product') {
-                array_unshift($items, ['title' => 'Join the waitlist', 'href' => '/waitlist']);
+                array_unshift($items, ['title' => 'Join the waitlist', 'href' => '/quiz']);
             }
 
             $group['items'] = $items;

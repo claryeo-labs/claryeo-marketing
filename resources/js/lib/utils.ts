@@ -54,6 +54,19 @@ export function formatCurrencyEstimatedBalance(
     );
 }
 
+// Performance optimization: Pre-instantiate module-level Intl.NumberFormat formatters to eliminate
+// costly object instantiation and reduce garbage collection overhead during frequent UI re-renders
+// (such as interactive real-time tax calculations, dashboard chart tooltips, and summary table updates).
+const ngnFormatter = new Intl.NumberFormat('en-NG', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
+const defaultFormatter = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
 export function formatCurrency(
     amount: number,
     currency: string = 'NGN',
@@ -84,8 +97,8 @@ export function formatCurrency(
     }
 
     if (currency === 'NGN') {
-        return `${symbol}${amount.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `${symbol}${ngnFormatter.format(amount)}`;
     }
 
-    return `${symbol}${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `${symbol}${defaultFormatter.format(amount)}`;
 }

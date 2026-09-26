@@ -20,5 +20,6 @@ class SecurityHeadersTest extends TestCase
         $response->assertHeader('Cross-Origin-Resource-Policy', 'same-origin');
         $response->assertHeader('X-Permitted-Cross-Domain-Policies', 'none');
         $response->assertHeader('X-XSS-Protection', '1; mode=block');
+        $response->assertHeader('Content-Security-Policy', "frame-ancestors 'self'");
     }
 }

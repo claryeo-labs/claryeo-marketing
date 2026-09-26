@@ -51,30 +51,6 @@ class FormProxyTest extends TestCase
             ->assertJsonPath('errors.email.0', 'The email field must be a valid email address.');
     }
 
-    public function test_waitlist_store_proxies_success(): void
-    {
-        Http::fake(['web.test/api/internal/waitlist' => Http::response(['data' => ['id' => 3]], 201)]);
-
-        $this->postJson('/waitlist', [
-            'email' => 'wait@example.com',
-            'source' => 'footer_cta',
-        ])->assertCreated();
-
-        Http::assertSent(fn (Request $request): bool => $request['email'] === 'wait@example.com'
-            && $request['source'] === 'footer_cta'
-            && $request->hasHeader('X-Internal-Token', 'secret'));
-    }
-
-    public function test_waitlist_store_validates_source_length(): void
-    {
-        $this->postJson('/waitlist', [
-            'email' => 'wait@example.com',
-            'source' => str_repeat('a', 256),
-        ])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['source']);
-    }
-
     public function test_get_started_renders_island_with_plans_and_app_handoff(): void
     {
         Http::fake([

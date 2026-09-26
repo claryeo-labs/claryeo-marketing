@@ -1,0 +1,51 @@
+/* Ported from claryeo-waitlist/apps/web/src/styles/index.css. The Tailwind 3
+   directives and config now live in ../waitlist.css (@theme). */
+@layer base {
+  :root { --background: 247 31% 6%; --foreground: 40 43% 97%; --card: 255 24% 10%; --card-foreground: 40 43% 97%; --popover: 255 24% 10%; --popover-foreground: 40 43% 97%; --primary: 40 43% 97%; --primary-foreground: 247 31% 6%; --secondary: 255 24% 15%; --secondary-foreground: 40 43% 97%; --muted: 255 24% 15%; --muted-foreground: 254 16% 69%; --accent: 255 24% 20%; --accent-foreground: 40 43% 97%; --destructive: 0 70% 55%; --destructive-foreground: 0 0% 98%; --border: 258 19% 18%; --input: 258 19% 24%; --ring: 208 100% 57%; --radius: 0.5rem; }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; margin: 0; font-family: 'Instrument Sans', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 36px; }
+body { min-width: 320px; }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+button, a { touch-action: manipulation; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible, a:focus-visible { outline: 2px solid #2596ff; outline-offset: 5px; }
+::selection { background: #2596ff; color: #fbf9f5; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
+/* Light mode is a true inversion of the dark palette: one filter over the page surface,
+   rather than a second set of 280-odd hand-picked colours to keep in step with the first.
+   hue-rotate puts the hues back where they started, so blue stays blue. */
+/* The surface paints its own background rather than letting body's show through: body sits
+   outside the filter, so any section without a background of its own would stay dark while
+   its text inverted to dark — unreadable from the second section down. */
+.theme-surface { background: var(--ink, #0b0a13); min-height: 100vh; }
+html[data-theme='light'] .theme-surface { filter: invert(1) hue-rotate(180deg); }
+/* Photographs and video must not flip, so they are inverted a second time back to normal. */
+html[data-theme='light'] .theme-surface :is(img, video) { filter: invert(1) hue-rotate(180deg); }
+/* The hero portrait already carries a grade; filter is one property, so it has to be restated. */
+html[data-theme='light'] .theme-surface .portrait-frame img { filter: invert(1) hue-rotate(180deg) saturate(.55) brightness(.78); }
+
+/* The button sits outside .theme-surface: a filtered ancestor becomes the containing block
+   for fixed descendants, which would leave it scrolling away with the page. */
+.theme-toggle { position: fixed; top: 24px; right: 24px; z-index: 100; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #fbf9f538; background: #16131fcc; color: #fbf9f5; backdrop-filter: blur(10px); transition: background-color .25s, border-color .25s; }
+.theme-toggle:hover { background: #221d30e6; border-color: #fbf9f566; }
+.theme-toggle-icon { display: grid; place-items: center; }
+html[data-theme='light'] .theme-toggle { border-color: #0b0a1330; background: #ffffffcc; color: #17131f; }
+html[data-theme='light'] .theme-toggle:hover { background: #ffffff; border-color: #0b0a1359; }
+@media (max-width: 900px) { .theme-toggle { top: 16px; right: 14px; width: 36px; height: 36px; } }
+
+/* The theme swap runs as a view transition so the browser paints a snapshot of the page
+   before and after, and the disc clips the new one over the old. A filtered overlay cannot
+   do this: it inverts whatever is behind it, photographs included. The animation here is a
+   no-op that exists only to hold the transition open — ThemeToggle drives the radius. */
+@keyframes theme-wipe-hold { from, to { opacity: 1; } }
+::view-transition-old(root), ::view-transition-new(root) { animation: theme-wipe-hold 620ms linear; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 0; }
+::view-transition-new(root) { z-index: 1; clip-path: circle(var(--theme-wipe-r, 0px) at var(--theme-wipe-x, 50%) var(--theme-wipe-y, 50%)); }
+::view-transition-image-pair(root) { isolation: auto; }

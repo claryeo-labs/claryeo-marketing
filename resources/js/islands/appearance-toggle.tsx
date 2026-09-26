@@ -36,6 +36,7 @@ const AppearanceToggle: FC<AppearanceToggleProps> = ({ className = '' }) => {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9 rounded-md"
+                aria-label={`Theme: ${current.label}. Switch to ${next.label}.`}
                 title={`Theme: ${current.label}`}
                 onClick={() => updateAppearance(next.value)}
             >
