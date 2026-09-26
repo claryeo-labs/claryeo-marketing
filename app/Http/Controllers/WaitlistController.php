@@ -114,7 +114,11 @@ class WaitlistController extends Controller
 
     private function relay(ClientResponse $response): JsonResponse
     {
-        return response()->json($response->json() ?? [], $response->status());
+        // Pass the body through verbatim: decoding to a PHP array and re-encoding
+        // turns an empty JSON object (`categories: {}`) into `[]`, which the UI rejects.
+        return json_validate($response->body())
+            ? JsonResponse::fromJsonString($response->body(), $response->status())
+            : response()->json([], $response->status());
     }
 
     /**
