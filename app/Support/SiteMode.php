@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Config;
  * The one place that answers "is the site in waitlist mode?".
  *
  * The switch is owned by the main app (GET /api/internal/site, cached ~60s
- * by MainApi). If that call fails, marketing falls back to its own
- * `marketing.waitlist_mode` config. A failed lookup also opens a short
+ * by MainApi). If that call fails, marketing keeps the last answer the main
+ * app gave, so a brief outage never flips the site; only with no answer ever
+ * seen does it fall back to its own `marketing.waitlist_mode` config (off
+ * unless set). A failed lookup also opens a short
  * backoff window so an outage costs one slow request, not one per request:
  * this is read by a global middleware on every page view.
  */
@@ -21,13 +23,21 @@ class SiteMode
 
     private const BACKOFF_SECONDS = 30;
 
+    private const LAST_KNOWN_KEY = 'marketing:site:waitlist_mode:last';
+
     public function __construct(private readonly MainApi $api) {}
 
     public function waitlist(): bool
     {
         $remote = $this->remoteWaitlistMode();
 
-        return $remote ?? Config::boolean('marketing.waitlist_mode');
+        if ($remote !== null) {
+            return $remote;
+        }
+
+        $lastKnown = Cache::get(self::LAST_KNOWN_KEY);
+
+        return is_bool($lastKnown) ? $lastKnown : Config::boolean('marketing.waitlist_mode');
     }
 
     private function remoteWaitlistMode(): ?bool
@@ -39,6 +49,8 @@ class SiteMode
         $site = $this->api->site();
 
         if (is_array($site) && is_bool($site['waitlist_mode'] ?? null)) {
+            Cache::forever(self::LAST_KNOWN_KEY, $site['waitlist_mode']);
+
             return $site['waitlist_mode'];
         }
 
