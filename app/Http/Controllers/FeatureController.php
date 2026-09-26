@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SiteMode;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Config;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,15 +71,15 @@ class FeatureController extends Controller
      * Render an individual feature page from config/feature_pages.php via the
      * shared feature-page island. The CTA honours waitlist mode.
      */
-    public function show(string $slug): View
+    public function show(SiteMode $siteMode, string $slug): View
     {
         $feature = config("feature_pages.{$slug}");
 
         abort_if(! is_array($feature), Response::HTTP_NOT_FOUND);
         /** @var array{title: string, heroParagraph: string, slug: string} $feature */
-        $waitlistMode = (bool) config('marketing.waitlist_mode');
+        $waitlistMode = $siteMode->waitlist();
         $cta = $waitlistMode
-            ? ['label' => 'Join the waitlist', 'href' => '/waitlist']
+            ? ['label' => 'Join the waitlist', 'href' => '/quiz']
             : ['label' => 'Get started', 'href' => '/get-started'];
 
         return view('feature', [
