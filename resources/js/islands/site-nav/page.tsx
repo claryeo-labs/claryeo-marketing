@@ -179,7 +179,7 @@ const SiteNav: FC<SiteNavProps> = ({
                 aria-controls={`${key}-menu-panel`}
                 onClick={() => setOpenMenu((v) => (v === key ? null : key))}
                 className={cn(
-                    'flex items-center gap-1 text-sm transition-colors',
+                    'flex items-center gap-1 rounded-xs text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                     isDark
                         ? openMenu === key
                             ? 'text-paper'
@@ -191,6 +191,7 @@ const SiteNav: FC<SiteNavProps> = ({
             >
                 {label}
                 <ChevronDown
+                    aria-hidden="true"
                     className={cn(
                         'size-4 transition-transform',
                         openMenu === key && 'rotate-180',
@@ -265,17 +266,19 @@ const SiteNav: FC<SiteNavProps> = ({
                         type="button"
                         onClick={() => setMobileOpen((v) => !v)}
                         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-nav-sheet"
                         className={cn(
-                            'inline-flex items-center justify-center rounded-full border p-2.5 transition-colors md:hidden',
+                            'inline-flex items-center justify-center rounded-full border p-2.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring md:hidden',
                             isDark
                                 ? 'border-paper/15 bg-paper/5 text-paper hover:bg-paper/10'
                                 : 'border-border/60 bg-muted/40 text-foreground hover:bg-muted/70',
                         )}
                     >
                         {mobileOpen ? (
-                            <X className="size-5" />
+                            <X className="size-5" aria-hidden="true" />
                         ) : (
-                            <Menu className="size-5" />
+                            <Menu className="size-5" aria-hidden="true" />
                         )}
                     </button>
                 </div>
@@ -413,6 +416,9 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Mobile sheet */}
             {mobileOpen && (
                 <div
+                    id="mobile-nav-sheet"
+                    role="region"
+                    aria-label="Mobile navigation"
                     className={cn(
                         'absolute inset-x-0 top-full max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b px-4 pb-8 shadow-2xl md:hidden',
                         isDark
