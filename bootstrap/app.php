@@ -2,8 +2,8 @@
 
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Http\Middleware\CaptureUtmParameters;
-use App\Http\Middleware\RedirectIfWaitlistMode;
 use App\Http\Middleware\RedirectToCanonicalHost;
+use App\Http\Middleware\WaitlistTakeover;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -35,9 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
             AddSecurityHeaders::class,
         ]);
 
-        $middleware->alias([
-            'waitlist.redirect' => RedirectIfWaitlistMode::class,
-        ]);
+        // Waitlist mode (see App\Support\SiteMode): global rather than in the
+        // web group so unmatched URLs are redirected too, not 404'd.
+        $middleware->append(WaitlistTakeover::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
