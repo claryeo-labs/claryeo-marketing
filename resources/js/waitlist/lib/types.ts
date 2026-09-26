@@ -82,7 +82,10 @@ export type CommunityCategories = {
 
 /** GET /waitlist/community. Aggregate only. */
 export interface CommunityStats {
+    /** Consenting quiz respondents: the only rows the percentages are built from. */
     total: number;
+    /** Everyone on the waitlist, including people who joined before the quiz. */
+    signups?: number;
     ready: boolean;
     min_responses: number;
     categories: CommunityCategories;
