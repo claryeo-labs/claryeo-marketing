@@ -5,6 +5,9 @@
 @source '../views';
 @source '../js';
 @source '../../content';
+/* Waitlist mode has its own stylesheet (waitlist.css); keep its sources out. */
+@source not '../js/waitlist';
+@source not '../js/islands/waitlist';
 
 @custom-variant dark (&:is(.dark *));
 

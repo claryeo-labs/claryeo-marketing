@@ -140,14 +140,6 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                         {waitlistMode ? 'Join the waitlist' : 'Get started free'}
                         <ArrowUpRight className="size-4" />
                     </a>
-                    {!waitlistMode && (
-                        <a
-                            href={waitlistUrl}
-                            className="text-sm text-mist underline-offset-4 hover:text-paper hover:underline"
-                        >
-                            Join the waitlist
-                        </a>
-                    )}
                 </div>
 
                 <form

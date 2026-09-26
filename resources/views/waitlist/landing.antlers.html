@@ -1,0 +1,36 @@
+{{ partial:waitlist-shell }}
+    {{# Server-rendered fallback for crawlers (and AI crawlers, which do not run
+        JS); the island replaces it on hydration. Copy is duplicated from
+        js/waitlist/components/landing/{Hero,Chapters,Landing}.tsx -- keep the
+        two in sync. #}}
+    <div data-island="waitlist-landing">
+        <div class="theme-surface landing">
+            <section class="hero wrap">
+                <div class="hero-copy">
+                    <h1 class="hero-title">You build. We handle <em class="hero-italic">the busywork.</em></h1>
+                    <p class="hero-description">Invoicing, bank sync, and tax. Finally, in sync. Less time figuring out your numbers. More time doing your thing.</p>
+                    <p><a class="text-link" href="/quiz">Let’s talk about your business</a> · About 2 min</p>
+                </div>
+            </section>
+            <section class="manifesto wrap">
+                <h2 class="section-display">You didn’t start a business to become <em>its bookkeeper.</em></h2>
+                <p class="section-aside">Invoices and reminders, bank sync and payment matching, PIT, CIT and VAT estimates, expenses and reports: in one place, for freelancers and small businesses.</p>
+            </section>
+            <section class="faq-section wrap">
+                <h2 class="section-display">A little clarity. <em>Before we begin.</em></h2>
+                <dl class="faq-list">
+                    <dt>What exactly is Claryeo?</dt>
+                    <dd>Claryeo brings invoicing, expenses, bank sync, payment matching, and tax estimates into one place. It’s built for freelancers and small businesses, so you can spend less time on admin and more time on your business.</dd>
+                    <dt>Why the questions before joining?</dt>
+                    <dd>Because your business isn’t one-size-fits-all. Your answers help us understand your biggest pain points, show you the Claryeo features that fit, and shape what we build next. It takes about two minutes.</dd>
+                    <dt>What happens after I join the waitlist?</dt>
+                    <dd>Your place on the early-access list is saved, and you’ll see your results straight away. We’ll use your email for launch and early-access updates, and your answers to help shape what we build.</dd>
+                </dl>
+            </section>
+            <footer class="footer wrap">
+                <span>© {{ now format="Y" }} Claryeo. Less admin. More life.</span>
+                <div><a href="/privacy">Privacy</a> <a href="mailto:hello@claryeo.com">Say hello</a></div>
+            </footer>
+        </div>
+    </div>
+{{ /partial:waitlist-shell }}
