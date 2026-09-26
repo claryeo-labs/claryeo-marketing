@@ -136,7 +136,10 @@ function normalizeAiCredits(value: number): number {
     return Math.round(clamped / AI_CREDIT_STEP) * AI_CREDIT_STEP;
 }
 
-function aiCreditPrice(credits: number): number {
+/**
+ * Un-memoized fallback price calculator for arbitrary credit amounts.
+ */
+function calculateAiCreditPrice(credits: number): number {
     const exactTier = AI_CREDIT_PRICE_TIERS.find(
         (tier) => tier.credits === credits,
     );
@@ -164,6 +167,23 @@ function aiCreditPrice(credits: number): number {
         (upperTier.priceNaira - lowerTier.priceNaira) * progress;
 
     return Math.round(interpolatedPrice / 100) * 100;
+}
+
+/**
+ * Performance optimization: Pre-computed price lookup map for all valid credit slider steps.
+ * Avoids array copying (`[...AI_CREDIT_PRICE_TIERS].reverse()`), linear `.find()` searches,
+ * and floating-point interpolation math on every component re-render and slider input.
+ */
+const AI_CREDIT_PRICE_MAP: Record<number, number> = (() => {
+    const map: Record<number, number> = {};
+    for (let c = AI_CREDIT_MIN; c <= AI_CREDIT_MAX; c += AI_CREDIT_STEP) {
+        map[c] = calculateAiCreditPrice(c);
+    }
+    return map;
+})();
+
+function aiCreditPrice(credits: number): number {
+    return AI_CREDIT_PRICE_MAP[credits] ?? calculateAiCreditPrice(credits);
 }
 
 function aiCreditCellForPlan(
