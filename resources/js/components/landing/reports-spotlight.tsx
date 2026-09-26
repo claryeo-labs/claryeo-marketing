@@ -22,7 +22,12 @@ const DRIFT = 120;
 
 const profit = (m: (typeof MONTHS)[number]) => m.income - m.expense;
 
-function profitPoints(): string {
+/**
+ * Precomputed static SVG polyline points for the profit trend line.
+ * Performance optimization: MONTHS, SCALE, and CHART_H are module constants, so computing
+ * points once at module load avoids redundant array iterations, float math, and string formatting on every render.
+ */
+const PROFIT_POINTS = (() => {
     // Bars sit in equal flex-1 cells and are centred in them, so a vertex
     // belongs at the centre of its month's cell -- not at the chart edges.
     const step = 100 / MONTHS.length;
@@ -30,7 +35,15 @@ function profitPoints(): string {
         const y = CHART_H - (profit(m) / SCALE) * CHART_H;
         return `${((i + 0.5) * step).toFixed(2)},${y.toFixed(1)}`;
     }).join(' ');
-}
+})();
+
+/** Precomputed aggregate totals for the static MONTHS array. */
+const TOTAL = MONTHS.reduce(
+    (acc, m) => ({ income: acc.income + m.income, expense: acc.expense + m.expense }),
+    { income: 0, expense: 0 },
+);
+
+const MARGIN = Math.round(((TOTAL.income - TOTAL.expense) / TOTAL.income) * 100);
 
 /**
  * The last entry in the ledger run: the month closing into a report. Two
@@ -68,12 +81,6 @@ const ReportsSpotlight: FC = () => {
         });
     }, []);
 
-    const total = MONTHS.reduce(
-        (acc, m) => ({ income: acc.income + m.income, expense: acc.expense + m.expense }),
-        { income: 0, expense: 0 },
-    );
-    const margin = Math.round(((total.income - total.expense) / total.income) * 100);
-
     return (
         <section
             ref={wrapperRef}
@@ -104,12 +111,12 @@ const ReportsSpotlight: FC = () => {
                             Profit &amp; loss · Mar–Aug
                         </span>
                         <span className="t-mono text-[11px] text-positive">
-                            {margin}% margin
+                            {MARGIN}% margin
                         </span>
                     </div>
 
                     <p className="t-figure-display mt-3 text-paper">
-                        {formatCurrency(total.income - total.expense, 'NGN', { compact: true })}
+                        {formatCurrency(TOTAL.income - TOTAL.expense, 'NGN', { compact: true })}
                     </p>
                     <p className="mt-1 t-mono text-[11px] text-mist">Profit, six months</p>
 
@@ -144,7 +151,7 @@ const ReportsSpotlight: FC = () => {
                                 <rect ref={sweepRef} x="0" y="0" width="0" height={CHART_H} />
                             </clipPath>
                             <polyline
-                                points={profitPoints()}
+                                points={PROFIT_POINTS}
                                 clipPath={`url(#${clipId})`}
                                 fill="none"
                                 stroke="var(--color-violet-bright)"
