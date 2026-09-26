@@ -1,0 +1,12 @@
+{{ partial:waitlist-shell }}
+    {{# The result lives in this tab's sessionStorage (written by the quiz), so
+        there is nothing to render server-side. #}}
+    <div data-island="waitlist-result">
+        <div class="theme-surface result-page">
+            <main class="result-empty wrap">
+                <h1>Your Claryeo fit</h1>
+                <p>Your results load in a moment. Haven’t answered yet? <a class="text-link" href="/quiz">Start the questions</a></p>
+            </main>
+        </div>
+    </div>
+{{ /partial:waitlist-shell }}

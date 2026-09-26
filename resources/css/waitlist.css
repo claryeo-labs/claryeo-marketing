@@ -1,0 +1,84 @@
+/*
+ * Waitlist mode stylesheet: the claryeo-waitlist web design (Next.js +
+ * Tailwind 3), ported to Tailwind 4.
+ *
+ * Scoping: this is a separate Vite entry, loaded only by the waitlist shell
+ * (views/partials/waitlist-shell) and never alongside site.css, so its
+ * palette, preflight and page styles cannot leak into the marketing design.
+ * It scans only the waitlist sources, so it ships only their utilities.
+ *
+ * The Tailwind 3 config (tailwind.config.ts) is re-expressed as @theme below:
+ * shadcn colours are HSL channel triplets in CSS variables (index.css), the
+ * radius scale follows --radius, and the accordion keyframes replace the
+ * tailwindcss-animate plugin. The page styles (index/app/quiz/community.css)
+ * are the source files verbatim (imported first, as CSS requires); they are
+ * unlayered, so, as before, they win over utilities.
+ */
+@import 'tailwindcss' source(none);
+@import './waitlist/index.css';
+@import './waitlist/app.css';
+@import './waitlist/quiz.css';
+@import './waitlist/community.css';
+
+@source '../js/waitlist';
+@source '../js/islands/waitlist';
+/* The source's Tailwind 3 `blocklist`: its own eyebrow-label copy would
+   otherwise generate the `overline` utility. */
+@source not inline('overline');
+
+@theme {
+    --font-sans: 'Instrument Sans', sans-serif;
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-card: hsl(var(--card));
+    --color-card-foreground: hsl(var(--card-foreground));
+    --color-popover: hsl(var(--popover));
+    --color-popover-foreground: hsl(var(--popover-foreground));
+    --color-primary: hsl(var(--primary));
+    --color-primary-foreground: hsl(var(--primary-foreground));
+    --color-secondary: hsl(var(--secondary));
+    --color-secondary-foreground: hsl(var(--secondary-foreground));
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-accent: hsl(var(--accent));
+    --color-accent-foreground: hsl(var(--accent-foreground));
+    --color-destructive: hsl(var(--destructive));
+    --color-destructive-foreground: hsl(var(--destructive-foreground));
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
+    --color-ring: hsl(var(--ring));
+
+    --animate-accordion-down: accordion-down 0.2s ease-out;
+    --animate-accordion-up: accordion-up 0.2s ease-out;
+
+    @keyframes accordion-down {
+        from {
+            height: 0;
+        }
+        to {
+            height: var(--radix-accordion-content-height);
+        }
+    }
+
+    @keyframes accordion-up {
+        from {
+            height: var(--radix-accordion-content-height);
+        }
+        to {
+            height: 0;
+        }
+    }
+}
+
+/* Island SSR fallbacks (crawler copy in views/waitlist/*) stay hidden from JS
+   browsers until the island hydrates -- the same rule site.css applies. */
+@layer base {
+    .js [data-island]:not([data-hydrated]) > * {
+        display: none;
+    }
+}
