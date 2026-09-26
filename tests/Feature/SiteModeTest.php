@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Support\SiteMode;
 use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -54,6 +55,21 @@ class SiteModeTest extends TestCase
 
         config()->set('marketing.waitlist_mode', false);
         $this->assertFalse(app(SiteMode::class)->waitlist());
+    }
+
+    public function test_an_outage_keeps_the_last_answer_from_the_main_app(): void
+    {
+        config()->set('marketing.waitlist_mode', false);
+        Http::fakeSequence('web.test/api/internal/site')
+            ->push(['waitlist_mode' => true])
+            ->push('', 500);
+
+        $this->assertTrue(app(SiteMode::class)->waitlist());
+
+        Cache::forget('marketing:site');
+
+        $this->assertTrue(app(SiteMode::class)->waitlist());
+        Http::assertSentCount(2);
     }
 
     public function test_falls_back_to_config_when_the_body_is_malformed(): void
