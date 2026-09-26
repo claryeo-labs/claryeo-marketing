@@ -1,4 +1,4 @@
-import type { Answers, WaitlistResponse } from '@/waitlist/lib/types';
+import type { Answers, CommunityStats, WaitlistResponse } from '@/waitlist/lib/types';
 import { ArrowUpRight, Copy, RefreshCw, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -10,14 +10,22 @@ import { Button } from '@/waitlist/components/ui/button';
 import { useCommunity } from '@/waitlist/hooks/useCommunity';
 import { readSession, SESSION_KEYS } from '@/waitlist/lib/session';
 
-const Respondents = ({ total }: { total: number | undefined }) => (
-    <div className="respondents" data-testid="community-respondents">
-        <strong data-testid="community-total">{total ?? '—'}</strong>
-        <span data-testid="community-total-label">
-            {total === 1 ? 'person has answered so far' : 'people have answered so far'}
-        </span>
-    </div>
-);
+/** Headline count: everyone on the waitlist, or quiz respondents from an API that predates `signups`. */
+const Respondents = ({ stats }: { stats: CommunityStats | null | undefined }) => {
+    const signups = stats?.signups;
+    const count = signups ?? stats?.total;
+    const label =
+        signups !== undefined
+            ? count === 1 ? 'person on the waitlist' : 'people on the waitlist'
+            : count === 1 ? 'person has answered so far' : 'people have answered so far';
+
+    return (
+        <div className="respondents" data-testid="community-respondents">
+            <strong data-testid="community-total">{count ?? '—'}</strong>
+            <span data-testid="community-total-label">{label}</span>
+        </div>
+    );
+};
 
 const Skeleton = () => (
     <div
@@ -127,7 +135,7 @@ export const ResultView = () => {
                             </p>
                         )}
                     </div>
-                    <Respondents total={stats?.total} />
+                    <Respondents stats={stats} />
                 </Reveal>
                 <section className="community-pulse" aria-labelledby="community-heading">
                     <div className="community-section-header">

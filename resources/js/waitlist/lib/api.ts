@@ -37,6 +37,7 @@ const isQuizResponse: Guard<QuizResponse> = (value): value is QuizResponse =>
 const isCommunityStats: Guard<CommunityStats> = (value): value is CommunityStats =>
     isObject(value) &&
     typeof value.total === 'number' &&
+    (value.signups === undefined || typeof value.signups === 'number') &&
     typeof value.ready === 'boolean' &&
     typeof value.min_responses === 'number' &&
     isObject(value.categories) &&
