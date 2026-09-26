@@ -152,6 +152,17 @@ class WaitlistProxyTest extends TestCase
         $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
     }
 
+    public function test_community_keeps_an_empty_categories_object_as_an_object(): void
+    {
+        $body = '{"total":0,"ready":false,"min_responses":5,"categories":{},"updated_at":"2026-09-26T00:00:00Z"}';
+        Http::fake(['web.test/api/internal/waitlist/community' => Http::response($body, 200, ['Content-Type' => 'application/json'])]);
+
+        $response = $this->get('/waitlist/community');
+
+        $response->assertOk();
+        $this->assertStringContainsString('"categories":{}', (string) $response->getContent());
+    }
+
     public function test_community_relays_upstream_errors(): void
     {
         Http::fake(['web.test/api/internal/waitlist/community' => Http::response(['detail' => 'Down for a moment.'], 503)]);
