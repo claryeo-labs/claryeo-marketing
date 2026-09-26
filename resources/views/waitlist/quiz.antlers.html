@@ -1,0 +1,13 @@
+{{ partial:waitlist-shell }}
+    {{# Questions are server-fetched (WaitlistController::quiz) and handed over
+        as props; the island falls back to GET /waitlist/quiz without them. #}}
+    <div data-island="waitlist-quiz" data-props="{{ island_props | raw }}">
+        <div class="theme-surface quiz-page">
+            <main class="quiz-loading wrap">
+                <h1>Find your clarity</h1>
+                <p>A few short questions about your business. The conversation needs JavaScript to run.</p>
+                <p><a class="text-link" href="/">Back to Claryeo</a></p>
+            </main>
+        </div>
+    </div>
+{{ /partial:waitlist-shell }}

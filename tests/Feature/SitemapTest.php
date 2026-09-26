@@ -26,17 +26,30 @@ class SitemapTest extends TestCase
         $this->assertStringContainsString('/blog/vat-for-nigerian-small-businesses</loc>', $body);
     }
 
-    public function test_sitemap_reflects_waitlist_mode(): void
+    public function test_sitemap_lists_pricing_and_get_started_outside_waitlist_mode(): void
     {
         config()->set('marketing.waitlist_mode', false);
-        $open = $this->get('/sitemap.xml')->getContent() ?: '';
-        $this->assertStringContainsString('/pricing</loc>', $open);
-        $this->assertStringContainsString('/get-started</loc>', $open);
 
+        $body = $this->get('/sitemap.xml')->getContent() ?: '';
+
+        $this->assertStringContainsString('/pricing</loc>', $body);
+        $this->assertStringContainsString('/get-started</loc>', $body);
+        $this->assertStringNotContainsString('/quiz</loc>', $body);
+    }
+
+    public function test_sitemap_lists_only_home_and_legal_pages_in_waitlist_mode(): void
+    {
         config()->set('marketing.waitlist_mode', true);
-        $waitlist = $this->get('/sitemap.xml')->getContent() ?: '';
-        $this->assertStringContainsString('/waitlist</loc>', $waitlist);
-        $this->assertStringNotContainsString('/pricing</loc>', $waitlist);
+
+        $response = $this->get('/sitemap.xml');
+
+        $response->assertOk();
+        preg_match_all('#<loc>([^<]+)</loc>#', $response->getContent() ?: '', $matches);
+
+        $this->assertSame(
+            [url('/'), url('/privacy'), url('/terms'), url('/cookies')],
+            $matches[1],
+        );
     }
 
     public function test_robots_disallows_crawlers_outside_production(): void

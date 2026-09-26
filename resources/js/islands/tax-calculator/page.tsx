@@ -2511,22 +2511,11 @@ const TaxCalculatorPage: FC = () => {
                                         asChild
                                         className="bg-gradient-primary text-primary-foreground hover:opacity-90"
                                     >
-                                        <Link href="/waitlist">
-                                            Get early access
+                                        <Link href="/get-started">
+                                            Create account
                                             <ArrowUpRight className="size-4" />
                                         </Link>
                                     </Button>
-                                    {!isWaitlistMode && (
-                                        <Button
-                                            asChild
-                                            variant="outline"
-                                            className="border-border bg-background/80 text-foreground hover:bg-accent hover:text-accent-foreground"
-                                        >
-                                            <Link href="/get-started">
-                                                Create account
-                                            </Link>
-                                        </Button>
-                                    )}
                                 </div>
                             </div>
                         </section>
