@@ -66,6 +66,13 @@ export const TAX_YEAR_PROFILES: TaxYearProfile[] = [
     },
 ];
 
+// Performance optimization: Pre-index profiles by key during module evaluation
+// to enable O(1) hash map lookups instead of O(N) array scans on every calculation cycle.
+const TAX_YEAR_PROFILES_BY_KEY: Record<string, TaxYearProfile> =
+    Object.fromEntries(
+        TAX_YEAR_PROFILES.map((profile) => [profile.key, profile]),
+    );
+
 export function getTaxYearProfiles(): TaxYearProfile[] {
     return TAX_YEAR_PROFILES;
 }
@@ -75,8 +82,5 @@ export function getDefaultTaxYearProfile(): TaxYearProfile {
 }
 
 export function getTaxYearProfileByKey(key: string): TaxYearProfile {
-    return (
-        TAX_YEAR_PROFILES.find((profile) => profile.key === key) ??
-        getDefaultTaxYearProfile()
-    );
+    return TAX_YEAR_PROFILES_BY_KEY[key] ?? getDefaultTaxYearProfile();
 }
