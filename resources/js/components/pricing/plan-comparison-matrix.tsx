@@ -1,6 +1,6 @@
 import { Check, Info, Minus } from 'lucide-react';
 import type { FC, ReactNode } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, memo, useMemo, useState } from 'react';
 
 import {
     Tooltip,
@@ -252,7 +252,12 @@ function FeatureLabel({
     );
 }
 
-function DesktopRow({
+/**
+ * Performance optimization: Memoized row components to avoid re-rendering
+ * ~30 static feature comparison rows during state changes (e.g., when moving
+ * the AI credit slider or updating the draft input).
+ */
+const DesktopRow = memo(function DesktopRow({
     row,
     plans,
     index,
@@ -296,9 +301,9 @@ function DesktopRow({
             ))}
         </div>
     );
-}
+});
 
-function MobileRow({
+const MobileRow = memo(function MobileRow({
     row,
     selectedPlan,
     index,
@@ -339,7 +344,7 @@ function MobileRow({
             </div>
         </div>
     );
-}
+});
 
 const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
     plans,
@@ -394,51 +399,71 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
             : `${proHeadline} monthly`;
     const savePercent = savingsPercent(proMonthlyKobo, proAnnualKobo);
 
-    const comparisonPlans: ComparisonPlan[] = [
-        {
-            key: 'free',
-            name: freePlan.name,
-            price: formatFreePriceLabel(freePlan.priceLabel),
-            ctaLabel: 'Get started',
-            ctaHref: getStartedUrl,
-        },
-        {
-            key: 'growth',
-            name: growthPlan.name,
-            price: growthPriceColumn,
-            ctaLabel: 'Get started',
-            ctaHref: `${getStartedUrl}?plan=growth&billing_interval=${billing}`,
-        },
-        {
-            key: 'pro',
-            name: proPlan.name,
-            price: proPriceColumn,
-            ctaLabel: 'Get started',
-            ctaHref: `${getStartedUrl}?plan=pro&billing_interval=${billing}`,
-            accent: true,
-        },
-        ...(enterprisePlan
-            ? [
-                  {
-                      key: 'enterprise' as const,
-                      name: enterprisePlan.name,
-                      price: enterprisePlan.priceLabel,
-                      ctaLabel: 'Contact sales',
-                      ctaHref: `${contactUrl}?plan=${enterprisePlan.key}`,
-                  },
-              ]
-            : []),
-    ];
+    // Performance optimization: Memoize comparison plans array and derived
+    // items so DesktopRow / MobileRow receive stable props and skip re-renders.
+    const comparisonPlans = useMemo<ComparisonPlan[]>(
+        () => [
+            {
+                key: 'free',
+                name: freePlan.name,
+                price: formatFreePriceLabel(freePlan.priceLabel),
+                ctaLabel: 'Get started',
+                ctaHref: getStartedUrl,
+            },
+            {
+                key: 'growth',
+                name: growthPlan.name,
+                price: growthPriceColumn,
+                ctaLabel: 'Get started',
+                ctaHref: `${getStartedUrl}?plan=growth&billing_interval=${billing}`,
+            },
+            {
+                key: 'pro',
+                name: proPlan.name,
+                price: proPriceColumn,
+                ctaLabel: 'Get started',
+                ctaHref: `${getStartedUrl}?plan=pro&billing_interval=${billing}`,
+                accent: true,
+            },
+            ...(enterprisePlan
+                ? [
+                      {
+                          key: 'enterprise' as const,
+                          name: enterprisePlan.name,
+                          price: enterprisePlan.priceLabel,
+                          ctaLabel: 'Contact sales',
+                          ctaHref: `${contactUrl}?plan=${enterprisePlan.key}`,
+                      },
+                  ]
+                : []),
+        ],
+        [
+            freePlan.name,
+            freePlan.priceLabel,
+            getStartedUrl,
+            growthPlan.name,
+            growthPriceColumn,
+            billing,
+            proPlan.name,
+            proPriceColumn,
+            enterprisePlan,
+            contactUrl,
+        ],
+    );
 
-    const selectedPlan =
-        comparisonPlans.find((plan) => plan.key === selectedPlanKey) ??
-        comparisonPlans[0];
+    const selectedPlan = useMemo(
+        () =>
+            comparisonPlans.find((plan) => plan.key === selectedPlanKey) ??
+            comparisonPlans[0],
+        [comparisonPlans, selectedPlanKey],
+    );
 
     const hasAiCreditAddOns = addOns.some((row) =>
         AI_CREDIT_ADD_ON_KEYS.includes(row.key),
     );
-    const nonAiAddOns = addOns.filter(
-        (row) => !AI_CREDIT_ADD_ON_KEYS.includes(row.key),
+    const nonAiAddOns = useMemo(
+        () => addOns.filter((row) => !AI_CREDIT_ADD_ON_KEYS.includes(row.key)),
+        [addOns],
     );
     const commitAiCreditDraft = (): void => {
         const normalizedCredits = normalizeAiCredits(Number(aiCreditsDraft));
@@ -447,26 +472,32 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
         setAiCreditsDraft(String(normalizedCredits));
         setIsEditingAiCredits(false);
     };
-    const addOnGroup: PricingComparisonGroup | null =
-        addOns.length > 0
-            ? {
-                  title: 'Add-ons',
-                  rows: nonAiAddOns.map((row) => ({
-                      ...row,
-                      description: '',
-                  })),
-              }
-            : null;
-    const aiCreditRow: PricingComparisonRow = {
-        key: 'ai_credits',
-        label: 'AI credits',
-        description:
-            'Optional credit packs for AI-assisted tax and finance workflows.',
-        free: aiCreditCellForPlan('free', selectedAiCredits),
-        growth: aiCreditCellForPlan('growth', selectedAiCredits),
-        pro: aiCreditCellForPlan('pro', selectedAiCredits),
-        enterprise: aiCreditCellForPlan('enterprise', selectedAiCredits),
-    };
+    const addOnGroup = useMemo<PricingComparisonGroup | null>(
+        () =>
+            addOns.length > 0
+                ? {
+                      title: 'Add-ons',
+                      rows: nonAiAddOns.map((row) => ({
+                          ...row,
+                          description: '',
+                      })),
+                  }
+                : null,
+        [addOns.length, nonAiAddOns],
+    );
+    const aiCreditRow = useMemo<PricingComparisonRow>(
+        () => ({
+            key: 'ai_credits',
+            label: 'AI credits',
+            description:
+                'Optional credit packs for AI-assisted tax and finance workflows.',
+            free: aiCreditCellForPlan('free', selectedAiCredits),
+            growth: aiCreditCellForPlan('growth', selectedAiCredits),
+            pro: aiCreditCellForPlan('pro', selectedAiCredits),
+            enterprise: aiCreditCellForPlan('enterprise', selectedAiCredits),
+        }),
+        [selectedAiCredits],
+    );
 
     return (
         <div className={cn('rounded-2xl bg-card/40', className)}>
