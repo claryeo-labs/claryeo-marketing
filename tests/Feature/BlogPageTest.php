@@ -94,6 +94,17 @@ class BlogPageTest extends TestCase
         $this->assertDatabaseMissing('post_views', ['entry_id' => 'not-a-real-entry']);
     }
 
+    public function test_views_are_not_recorded_for_invalid_or_oversized_entry_ids(): void
+    {
+        $oversizedId = str_repeat('a', 150);
+
+        $this->post('/blog/invalid%20entry!/view')->assertNoContent();
+        $this->post("/blog/{$oversizedId}/view")->assertNoContent();
+
+        $this->assertDatabaseMissing('post_views', ['entry_id' => 'invalid entry!']);
+        $this->assertDatabaseMissing('post_views', ['entry_id' => $oversizedId]);
+    }
+
     public function test_view_tracking_can_be_disabled_via_config(): void
     {
         config(['marketing.view_tracking' => false]);
