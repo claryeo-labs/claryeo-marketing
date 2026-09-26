@@ -18,6 +18,8 @@ class MainApi
 {
     private const CACHE_TTL = 300;
 
+    private const SITE_CACHE_TTL = 60;
+
     private const TIMEOUT = 8;
 
     public function __construct(
@@ -76,7 +78,37 @@ class MainApi
     }
 
     /**
-     * Submit a waitlist signup. Not cached.
+     * Site-wide switches owned by the main app (`{waitlist_mode: bool}`). Short
+     * TTL so flipping WAITLIST_MODE there reaches marketing within a minute.
+     * Unwrapped: the endpoint does not use a `data` envelope.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function site(): ?array
+    {
+        return $this->cachedGet('marketing:site', 'site', null, self::SITE_CACHE_TTL, null);
+    }
+
+    /**
+     * Waitlist quiz questions (`{questions: Question[]}`), unwrapped.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function waitlistQuiz(): ?array
+    {
+        return $this->cachedGet('marketing:waitlist:quiz', 'waitlist/quiz', null, self::CACHE_TTL, null);
+    }
+
+    /**
+     * Live community stats. Never cached: the numbers move with every signup.
+     */
+    public function waitlistCommunity(): Response
+    {
+        return $this->request()->get('waitlist/community');
+    }
+
+    /**
+     * Submit a waitlist signup (name, email, company, answers, consent). Not cached.
      *
      * @param  array<string, mixed>  $payload
      */
@@ -104,25 +136,38 @@ class MainApi
     }
 
     /**
-     * GET a `data`-wrapped endpoint, caching success and serving the last good
-     * value (or the fallback) on failure.
+     * GET an endpoint, caching success and serving the last good value (or the
+     * fallback) on failure. `$key` is the envelope to unwrap (`data` by
+     * default); null returns the whole JSON body.
      *
      * @template TFallback
      *
      * @param  TFallback  $fallback
      * @return array<string, mixed>|TFallback
      */
-    private function cachedGet(string $cacheKey, string $path, mixed $fallback): mixed
+    private function cachedGet(string $cacheKey, string $path, mixed $fallback, int $ttl = self::CACHE_TTL, ?string $key = 'data'): mixed
     {
         try {
-            return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($path, $fallback) {
+            return Cache::remember($cacheKey, $ttl, function () use ($path, $key) {
                 $response = $this->request()->get($path);
 
                 if ($response->failed()) {
                     throw new \RuntimeException("Main API GET {$path} returned {$response->status()}");
                 }
 
-                return $response->json('data', $fallback);
+                $body = $key === null ? $response->json() : $response->json($key);
+
+                if (! is_array($body)) {
+                    throw new \RuntimeException("Main API GET {$path} returned an unexpected body");
+                }
+
+                // Every endpoint answers with a JSON object.
+                $object = [];
+                foreach ($body as $field => $value) {
+                    $object[(string) $field] = $value;
+                }
+
+                return $object;
             });
         } catch (Throwable $e) {
             Log::warning('MainApi GET failed; serving cached/fallback value.', [

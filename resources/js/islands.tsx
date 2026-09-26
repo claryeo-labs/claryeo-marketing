@@ -22,7 +22,6 @@ type IslandLoader = () => Promise<{
 const registry = {
     pricing: () => import('./islands/pricing/page'),
     'contact-form': () => import('./islands/contact/page'),
-    'waitlist-form': () => import('./islands/waitlist/page'),
     'tax-calculator': () => import('./islands/tax-calculator/page'),
     'appearance-toggle': () => import('./islands/appearance-toggle'),
     'site-nav': () => import('./islands/site-nav/page'),
@@ -34,6 +33,10 @@ const registry = {
     'legal-document': () => import('./islands/legal/document'),
     'legal-versions': () => import('./islands/legal/versions'),
     'site-cta': () => import('./components/site-cta'),
+    // Waitlist mode (views/waitlist/*, ported from claryeo-waitlist).
+    'waitlist-landing': () => import('./islands/waitlist/landing'),
+    'waitlist-quiz': () => import('./islands/waitlist/quiz'),
+    'waitlist-result': () => import('./islands/waitlist/result'),
 } as unknown as Record<string, IslandLoader>;
 
 function mountIslands(): void {

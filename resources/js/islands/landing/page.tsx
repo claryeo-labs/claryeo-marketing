@@ -38,8 +38,10 @@ type LandingProps = {
 };
 
 const Landing: FC<LandingProps> = ({ plans = [], waitlistMode = false }) => {
-    const getStartedUrl = waitlistMode ? '/waitlist' : '/get-started';
-    const waitlistUrl = '/waitlist';
+    // Waitlist mode serves its own landing page at /, so this island only
+    // renders with waitlistMode off; the branches below are kept for safety.
+    const getStartedUrl = waitlistMode ? '/quiz' : '/get-started';
+    const waitlistUrl = '/quiz';
 
     return (
         <div className="w-full">
@@ -145,11 +147,7 @@ const Landing: FC<LandingProps> = ({ plans = [], waitlistMode = false }) => {
                         : 'Get started free',
                     href: waitlistMode ? waitlistUrl : getStartedUrl,
                 }}
-                secondary={
-                    waitlistMode
-                        ? null
-                        : { label: 'Join the waitlist', href: waitlistUrl }
-                }
+                secondary={null}
             />
         </div>
     );

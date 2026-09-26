@@ -3,6 +3,7 @@
 {{ urls }}
     <url><loc>{{ value }}</loc></url>
 {{ /urls }}
+{{ if include_collections }}
 {{ collection:blog }}
     <url><loc>{{ permalink }}</loc>{{ if updated_at }}<lastmod>{{ updated_at format="Y-m-d" }}</lastmod>{{ /if }}</url>
 {{ /collection:blog }}
@@ -15,4 +16,5 @@
 {{ collection:glossary }}
     <url><loc>{{ permalink }}</loc>{{ if updated_at }}<lastmod>{{ updated_at format="Y-m-d" }}</lastmod>{{ /if }}</url>
 {{ /collection:glossary }}
+{{ /if }}
 </urlset>

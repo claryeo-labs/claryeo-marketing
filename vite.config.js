@@ -9,6 +9,8 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/site.css',
+                // Waitlist mode only (views/partials/waitlist-shell).
+                'resources/css/waitlist.css',
                 'resources/js/site.js',
                 'resources/js/islands.tsx',
             ],

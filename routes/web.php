@@ -10,13 +10,14 @@ use App\Http\Controllers\PricingController;
 use App\Http\Controllers\TaxCalculatorController;
 use App\Http\Controllers\WaitlistController;
 use App\Support\SalaryPages;
+use App\Support\SiteMode;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 
 Route::get('/', LandingController::class)->name('home');
 
-Route::get('pricing', PricingController::class)->middleware('waitlist.redirect')->name('pricing');
+Route::get('pricing', PricingController::class)->name('pricing');
 
 Route::get('features', [FeatureController::class, 'index'])->name('features');
 Route::get('features/{slug}', [FeatureController::class, 'show'])->name('features.show');
@@ -68,7 +69,7 @@ Route::view('glossary', 'glossary.index', [
     'meta_description' => 'Plain-English definitions of Nigerian tax terms: PAYE, PIT, CIT, VAT, WHT, TIN, rent relief and more, each with a worked example on the 2026 rules.',
 ])->name('glossary');
 
-Route::get('get-started', GetStartedController::class)->middleware('waitlist.redirect')->name('get-started');
+Route::get('get-started', GetStartedController::class)->name('get-started');
 
 Route::get('tax-calculator', [TaxCalculatorController::class, 'show'])->name('taxCalculator');
 Route::post('tax-calculator/report', [TaxCalculatorController::class, 'report'])->middleware('throttle:6,1')->name('taxCalculator.report.store');
@@ -83,9 +84,18 @@ Route::get('contact', [ContactController::class, 'show'])->name('contact');
 Route::post('contact', [ContactController::class, 'store'])->middleware('throttle:6,1')->name('contact.store');
 Route::view('contact/thank-you', 'contact.thank-you', ['title' => 'Thank you | Claryeo'])->name('contact.thank-you');
 
-Route::get('waitlist', [WaitlistController::class, 'show'])->name('waitlist');
+/*
+| Waitlist (ported from claryeo-waitlist). / serves its landing page in
+| waitlist mode (LandingController). App\Http\Middleware\WaitlistTakeover
+| redirects everything outside its allowlist to / while waitlist mode is on,
+| and sends /quiz + /result to /get-started while it is off. The JSON routes
+| are same-origin proxies to the main app's internal API.
+*/
+Route::get('quiz', [WaitlistController::class, 'quiz'])->name('waitlist.quiz');
+Route::get('result', [WaitlistController::class, 'result'])->name('waitlist.result');
+Route::get('waitlist/quiz', [WaitlistController::class, 'questions'])->name('waitlist.questions');
+Route::get('waitlist/community', [WaitlistController::class, 'community'])->name('waitlist.community');
 Route::post('waitlist', [WaitlistController::class, 'store'])->middleware('throttle:6,1')->name('waitlist.store');
-Route::view('waitlist/thank-you', 'waitlist.thank-you', ['title' => "You're on the list | Claryeo"])->name('waitlist.thank-you');
 
 /*
 | Legal pages. Content + versioning are owned by the main Claryeo app and
@@ -112,7 +122,18 @@ foreach (['privacy', 'terms', 'cookies'] as $slug) {
 | + published blog posts via the Statamic collection tag) and a host-aware
 | robots.txt that only invites crawlers in production.
 */
-Route::get('sitemap.xml', function () {
+Route::get('sitemap.xml', function (SiteMode $siteMode) {
+    // Waitlist mode: every other page redirects to /, so only / and the legal
+    // pages are real, indexable URLs.
+    if ($siteMode->waitlist()) {
+        return response()
+            ->view('sitemap', [
+                'urls' => array_map(fn (string $path): string => url($path), ['/', '/privacy', '/terms', '/cookies']),
+                'include_collections' => false,
+            ])
+            ->header('Content-Type', 'application/xml');
+    }
+
     $urls = ['/', '/features', '/about', '/tax-calculator', '/contact', '/blog', '/guides', '/glossary'];
 
     foreach (array_keys((array) config('feature_pages', [])) as $slug) {
@@ -131,15 +152,14 @@ Route::get('sitemap.xml', function () {
         $urls[] = '/'.$slug;
     }
 
-    if (config('marketing.waitlist_mode')) {
-        $urls[] = '/waitlist';
-    } else {
-        $urls[] = '/pricing';
-        $urls[] = '/get-started';
-    }
+    $urls[] = '/pricing';
+    $urls[] = '/get-started';
 
     return response()
-        ->view('sitemap', ['urls' => array_map(fn (string $path): string => url($path), $urls)])
+        ->view('sitemap', [
+            'urls' => array_map(fn (string $path): string => url($path), $urls),
+            'include_collections' => true,
+        ])
         ->header('Content-Type', 'application/xml');
 })->name('sitemap');
 
