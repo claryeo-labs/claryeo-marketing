@@ -1,6 +1,6 @@
 import { ArrowUpRight, ChevronDown, Menu, X } from 'lucide-react';
 import type { FC } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import AppearanceToggle from '@/islands/appearance-toggle';
 import { cn } from '@/lib/utils';
@@ -57,16 +57,25 @@ const SiteNav: FC<SiteNavProps> = ({
         : 'text-sm text-muted-foreground transition-colors hover:text-foreground';
 
     // In waitlist mode, pricing/get-started links are removed from the menus.
-    const hidden = waitlistMode ? ['/pricing', '/get-started'] : [];
-    const visible = (href: string): boolean => !hidden.includes(href);
+    // Performance optimization: Memoize filtered columns and support array derivations
+    // so array mapping/filtering does not run on every scroll event or drawer toggle.
+    const columns = useMemo(() => {
+        const hidden = waitlistMode ? ['/pricing', '/get-started'] : [];
+        const visible = (href: string): boolean => !hidden.includes(href);
+        return (resources.columns ?? []).map((col) => ({
+            ...col,
+            links: col.links.filter((l) => visible(l.href)),
+        }));
+    }, [resources.columns, waitlistMode]);
+
+    const support = useMemo(() => {
+        const hidden = waitlistMode ? ['/pricing', '/get-started'] : [];
+        const visible = (href: string): boolean => !hidden.includes(href);
+        return (resources.support ?? []).filter((s) => visible(s.href));
+    }, [resources.support, waitlistMode]);
 
     const featureItems = features.items ?? [];
     const featureLead = features.lead;
-    const columns = (resources.columns ?? []).map((col) => ({
-        ...col,
-        links: col.links.filter((l) => visible(l.href)),
-    }));
-    const support = (resources.support ?? []).filter((s) => visible(s.href));
     const resourcesLead = resources.lead;
     const loginHref = `${appUrl}/login`;
 
