@@ -323,7 +323,10 @@ const Contact: FC<ContactProps> = ({
                                 className="bg-gradient-primary mt-1 h-11 w-full rounded-xl text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
                             >
                                 {processing ? (
-                                    <Spinner />
+                                    <>
+                                        <Spinner />
+                                        <span>Sending message…</span>
+                                    </>
                                 ) : (
                                     <>
                                         Send message
