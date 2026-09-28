@@ -75,4 +75,21 @@ class TaxCalculatorTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('errors.payload.0', 'Malformed payload.');
     }
+
+    public function test_report_rejects_excessive_payload_array_items(): void
+    {
+        Http::fake();
+
+        $oversizedPayload = array_fill(0, 51, 'item');
+
+        $this->postJson('/tax-calculator/report', [
+            'email' => 'ada@example.com',
+            'consent_contact' => true,
+            'payload' => $oversizedPayload,
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['payload']);
+
+        Http::assertNothingSent();
+    }
 }
