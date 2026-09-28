@@ -265,6 +265,8 @@ const SiteNav: FC<SiteNavProps> = ({
                         type="button"
                         onClick={() => setMobileOpen((v) => !v)}
                         aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-menu-drawer"
                         className={cn(
                             'inline-flex items-center justify-center rounded-full border p-2.5 transition-colors md:hidden',
                             isDark
@@ -413,6 +415,7 @@ const SiteNav: FC<SiteNavProps> = ({
             {/* Mobile sheet */}
             {mobileOpen && (
                 <div
+                    id="mobile-menu-drawer"
                     className={cn(
                         'absolute inset-x-0 top-full max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-b px-4 pb-8 shadow-2xl md:hidden',
                         isDark
