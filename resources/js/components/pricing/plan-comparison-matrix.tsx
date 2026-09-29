@@ -118,12 +118,18 @@ function cellForPlan(
     return row[planKey];
 }
 
+// Performance optimization: Pre-instantiate module-level Intl.NumberFormat formatters
+// to avoid object instantiation on every slider movement and comparison table render.
+const ngnIntegerFormatter = new Intl.NumberFormat('en-NG', {
+    maximumFractionDigits: 0,
+});
+
 function formatCredits(credits: number): string {
-    return credits.toLocaleString('en-NG');
+    return ngnIntegerFormatter.format(credits);
 }
 
 function formatNaira(amount: number): string {
-    return `₦${amount.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`;
+    return `₦${ngnIntegerFormatter.format(amount)}`;
 }
 
 function normalizeAiCredits(value: number): number {

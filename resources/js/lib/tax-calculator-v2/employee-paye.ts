@@ -75,12 +75,22 @@ function calculateProgressiveBandAllocations(
     return allocations;
 }
 
+// Performance optimization: Pre-instantiate module-level Intl.NumberFormat formatters
+// to eliminate object allocation and locale options parsing during hot tax calculations.
+const percentFormatter = new Intl.NumberFormat('en-NG', {
+    maximumFractionDigits: 2,
+});
+
+const nairaFormatter = new Intl.NumberFormat('en-NG', {
+    maximumFractionDigits: 0,
+});
+
 function formatRate(rate: number): string {
-    return `${(rate * 100).toLocaleString('en-NG', { maximumFractionDigits: 2 })}%`;
+    return `${percentFormatter.format(rate * 100)}%`;
 }
 
 function formatNaira(value: number): string {
-    return `₦${Math.round(value).toLocaleString('en-NG')}`;
+    return `₦${nairaFormatter.format(Math.round(value))}`;
 }
 
 function formatBandScope(
@@ -231,7 +241,7 @@ export function calculateEmployeePaye(
                 rows: [
                     {
                         key: 'rent_relief_total',
-                        label: `Rent relief (${Math.round(input.profile.paye.rentRelief.rate * 100)}%, max ${input.profile.paye.rentRelief.annualCap.toLocaleString('en-NG')})`,
+                        label: `Rent relief (${Math.round(input.profile.paye.rentRelief.rate * 100)}%, max ${nairaFormatter.format(input.profile.paye.rentRelief.annualCap)})`,
                         annualAmount: -rentRelief,
                         tone: 'muted',
                     },

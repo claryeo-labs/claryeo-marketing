@@ -9,10 +9,16 @@ export function planByKey(
     return plans.find((p) => p.key === key);
 }
 
+// Performance optimization: Pre-instantiate module-level Intl.NumberFormat formatter
+// to eliminate object allocation during pricing card/table label formatting.
+const ngnIntegerFormatter = new Intl.NumberFormat('en-NG', {
+    maximumFractionDigits: 0,
+});
+
 export function formatNgnFromKobo(kobo: number): string {
     const ngn = kobo / 100;
 
-    return `₦${ngn.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`;
+    return `₦${ngnIntegerFormatter.format(ngn)}`;
 }
 
 export function savingsPercent(
