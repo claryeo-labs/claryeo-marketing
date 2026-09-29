@@ -21,16 +21,17 @@ class BlogViewController extends Controller
             return response()->noContent();
         }
 
-        $key = 'blog_viewed_'.$id;
-
-        if ($request->session()->has($key)) {
-            return response()->noContent();
-        }
-
         $entry = Entry::find($id);
 
         if ($entry instanceof EntryItem && $entry->collectionHandle() === 'blog' && $entry->published()) {
-            $views->record($id);
+            $canonicalId = (string) $entry->id();
+            $key = 'blog_viewed_'.$canonicalId;
+
+            if ($request->session()->has($key)) {
+                return response()->noContent();
+            }
+
+            $views->record($canonicalId);
             $request->session()->put($key, true);
         }
 
