@@ -145,6 +145,14 @@ function formatSignedNaira(value: number): string {
     return formatCurrency(value, 'NGN');
 }
 
+// Performance optimization: Pre-instantiate static Intl.DateTimeFormat to avoid
+// object creation overhead during tax calculator page renders.
+const enNgDateFormatter = new Intl.DateTimeFormat('en-NG', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+});
+
 function formatRuleDate(value: string): string {
     const dateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
@@ -156,11 +164,7 @@ function formatRuleDate(value: string): string {
             Number.parseInt(day, 10),
         );
 
-        return parsedDate.toLocaleDateString('en-NG', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-        });
+        return enNgDateFormatter.format(parsedDate);
     }
 
     const parsedDate = new Date(value);
@@ -169,11 +173,7 @@ function formatRuleDate(value: string): string {
         return value;
     }
 
-    return parsedDate.toLocaleDateString('en-NG', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-    });
+    return enNgDateFormatter.format(parsedDate);
 }
 
 function rowToneClasses(tone?: RowTone): string {

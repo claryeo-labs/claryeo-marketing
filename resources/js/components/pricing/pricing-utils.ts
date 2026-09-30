@@ -9,10 +9,16 @@ export function planByKey(
     return plans.find((p) => p.key === key);
 }
 
+// Performance optimization: Pre-instantiate static Intl.NumberFormat to avoid
+// object creation on pricing plan formatting calls.
+const enNgZeroDecimalFormatter = new Intl.NumberFormat('en-NG', {
+    maximumFractionDigits: 0,
+});
+
 export function formatNgnFromKobo(kobo: number): string {
     const ngn = kobo / 100;
 
-    return `₦${ngn.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`;
+    return `₦${enNgZeroDecimalFormatter.format(ngn)}`;
 }
 
 export function savingsPercent(

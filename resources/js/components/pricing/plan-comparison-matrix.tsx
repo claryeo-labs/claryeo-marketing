@@ -118,12 +118,19 @@ function cellForPlan(
     return row[planKey];
 }
 
+// Performance optimization: Pre-instantiate static Intl.NumberFormat instances to avoid
+// object creation on pricing credit and amount formatting.
+const enNgIntegerFormatter = new Intl.NumberFormat('en-NG');
+const enNgZeroDecimalFormatter = new Intl.NumberFormat('en-NG', {
+    maximumFractionDigits: 0,
+});
+
 function formatCredits(credits: number): string {
-    return credits.toLocaleString('en-NG');
+    return enNgIntegerFormatter.format(credits);
 }
 
 function formatNaira(amount: number): string {
-    return `₦${amount.toLocaleString('en-NG', { maximumFractionDigits: 0 })}`;
+    return `₦${enNgZeroDecimalFormatter.format(amount)}`;
 }
 
 function normalizeAiCredits(value: number): number {

@@ -20,6 +20,10 @@ const PILLARS: Pillar[] = [
 const TYPE_MS = 85;
 const HOLD_TICKS = 20;
 
+// Performance optimization: Pre-instantiate static Intl.NumberFormat to avoid
+// object creation on every income input keystroke.
+const enNgIntegerFormatter = new Intl.NumberFormat('en-NG');
+
 type LandingHeroProps = {
     getStartedUrl: string;
     waitlistUrl: string;
@@ -85,7 +89,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
     // this stays a text input with a numeric keypad and formats on change.
     const handleIncomeChange = (raw: string): void => {
         const digits = raw.replace(/\D/g, '').slice(0, 12);
-        setIncome(digits === '' ? '' : Number(digits).toLocaleString('en-NG'));
+        setIncome(digits === '' ? '' : enNgIntegerFormatter.format(Number(digits)));
     };
 
     const handleSubmit = (e: SubmitEvent<HTMLFormElement>): void => {
