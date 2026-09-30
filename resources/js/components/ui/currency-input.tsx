@@ -31,6 +31,32 @@ export function normalizeCurrencyInput(value: string): string {
   return `${wholePart}.${decimalPart}`
 }
 
+// Performance optimization: Pre-instantiate static Intl.NumberFormat instances to eliminate
+// costly object creation overhead during input blur / formatting events.
+const enNgDecimalFormatter = new Intl.NumberFormat("en-NG", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+const formatterCache = new Map<string, Intl.NumberFormat>()
+
+function getDecimalFormatter(locale: string): Intl.NumberFormat {
+  if (locale === "en-NG") {
+    return enNgDecimalFormatter
+  }
+
+  let cached = formatterCache.get(locale)
+  if (!cached) {
+    cached = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    formatterCache.set(locale, cached)
+  }
+
+  return cached
+}
+
 export function formatCurrencyInputValue(
   value: string,
   locale: string = "en-NG"
@@ -39,10 +65,7 @@ export function formatCurrencyInputValue(
   const parsed = Number.parseFloat(normalized)
   const amount = Number.isFinite(parsed) ? parsed : 0
 
-  return amount.toLocaleString(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
+  return getDecimalFormatter(locale).format(amount)
 }
 
 function CurrencyInput({

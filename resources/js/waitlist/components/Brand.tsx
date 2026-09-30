@@ -77,12 +77,12 @@ export const JoinButton = ({
 export const Footer = () => (
     <footer className="footer wrap">
         <Brand suffix="footer" />
-        <span data-testid="footer-copyright">© {new Date().getFullYear()} Claryeo. Less admin. More life.</span>
+        <span data-testid="footer-copyright">© {new Date().getFullYear()} JLA Technologies Ltd. Claryeo is a product of JLA Technologies Ltd.</span>
         <div>
             <a href="/privacy" data-testid="footer-privacy">
                 Privacy
             </a>
-            <a href="mailto:hello@claryeo.com" data-testid="footer-contact">
+            <a href="/contact" data-testid="footer-contact">
                 Say hello <ArrowUpRight size={13} />
             </a>
         </div>

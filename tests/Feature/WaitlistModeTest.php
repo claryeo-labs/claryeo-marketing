@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Finder\SplFileInfo;
 use Tests\TestCase;
 
 /**
@@ -161,6 +163,21 @@ class WaitlistModeTest extends TestCase
         config()->set('marketing.waitlist_mode', true);
 
         $this->get('/')->assertSee('href="/contact"', false)->assertDontSee('mailto:hello@claryeo.com', false);
+    }
+
+    /**
+     * The waitlist UI is rendered client-side and replaces the server footer,
+     * so its React components need the same guarantee as the Antlers markup.
+     */
+    public function test_waitlist_components_send_say_hello_to_the_contact_form(): void
+    {
+        $sources = collect(File::allFiles(resource_path('js/waitlist')))
+            ->mapWithKeys(fn (SplFileInfo $file): array => [$file->getRelativePathname() => $file->getContents()]);
+
+        $withMailto = $sources->filter(fn (string $contents): bool => str_contains($contents, 'mailto:'))->keys();
+
+        $this->assertEmpty($withMailto, 'mailto: links in waitlist components: '.$withMailto->implode(', '));
+        $this->assertStringContainsString('href="/contact" data-testid="footer-contact"', $sources['components/Brand.tsx']);
     }
 
     public function test_waitlist_mode_lets_the_proxy_endpoints_and_control_panel_through(): void
