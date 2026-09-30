@@ -367,7 +367,11 @@ const GetStarted: FC<GetStartedProps> = ({
                                             </span>
                                         </div>
 
-                                        <div className="mt-4 inline-flex w-full rounded-full border border-border bg-card p-1">
+                                        <div
+                                            role="group"
+                                            aria-label="Billing cadence"
+                                            className="mt-4 inline-flex w-full rounded-full border border-border bg-card p-1"
+                                        >
                                             {(
                                                 ['monthly', 'annual'] as const
                                             ).map((interval) => (
@@ -409,7 +413,11 @@ const GetStarted: FC<GetStartedProps> = ({
                                         </p>
                                     </div>
 
-                                    <div className="mt-5 grid gap-3">
+                                    <div
+                                        role="group"
+                                        aria-label="Available plans"
+                                        className="mt-5 grid gap-3"
+                                    >
                                         {planCards.map((plan, index) => {
                                             const Icon = plan.icon;
                                             const isSelected =
@@ -439,7 +447,7 @@ const GetStarted: FC<GetStartedProps> = ({
                                                         )
                                                     }
                                                     className={cn(
-                                                        'group rounded-[1.8rem] border p-5 text-left transition-all',
+                                                        'group rounded-[1.8rem] border p-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                                                         isSelected &&
                                                             isPremium &&
                                                             'border-primary/35 bg-linear-to-br from-primary/10 via-card to-card shadow-lg',
