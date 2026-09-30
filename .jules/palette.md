@@ -10,6 +10,9 @@
 **Learning:** Custom collapsible section triggers (such as group summary headers in complex interactive tools) and icon-only action buttons (such as line item removal icons) missing `aria-expanded` and descriptive `aria-label` attributes leave screen reader users unaware of toggle state or button purpose.
 **Action:** Always provide `aria-expanded={isOpen}` on collapsible section trigger buttons and contextual `aria-label` attributes on icon-only buttons.
 
+## 2026-08-22 - Mobile Navigation Drawer Accessibility and Focus Ring Indicators
+**Learning:** Mobile header menu toggle buttons and dropdown menu triggers without `aria-expanded`, `aria-controls`, and `focus-visible` focus indicators prevent keyboard and screen reader users from identifying expanded drawer regions or tracking keyboard focus on header controls.
+**Action:** Ensure navigation toggle buttons specify `aria-expanded`, target `aria-controls` for drawer containers, and include visible `focus-visible:ring-2` focus states.
 ## 2026-09-30 - Plan Selection Card Focus States & Grouping
 **Learning:** Interactive option selection cards (such as plan selection choices in onboarding) implemented as custom buttons require explicit `focus-visible:ring-2` focus indicators and container `role="group"` with descriptive `aria-label`. Without focus visible styling and semantic grouping, keyboard users cannot visually locate active focus and screen readers cannot announce choice options in group context.
 **Action:** Always wrap interactive selection card lists in `<div role="group" aria-label="...">` and apply `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2` focus ring classes.
