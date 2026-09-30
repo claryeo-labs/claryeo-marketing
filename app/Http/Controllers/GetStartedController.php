@@ -22,8 +22,17 @@ class GetStartedController extends Controller
     {
         $pricing = $this->api->pricing();
 
-        $initialPlan = $request->string('plan')->value();
-        $initialInterval = $request->string('billing_interval')->value();
+        $rawPlan = $request->query('plan');
+        $rawInterval = $request->query('billing_interval');
+
+        // Sanitize and validate query parameters before forwarding to island props
+        $initialPlan = is_string($rawPlan) && preg_match('/^[a-zA-Z0-9_\-]{1,32}$/', $rawPlan) === 1
+            ? $rawPlan
+            : null;
+
+        $initialInterval = is_string($rawInterval) && in_array($rawInterval, ['monthly', 'annual'], true)
+            ? $rawInterval
+            : null;
 
         return view('get-started', [
             'title' => 'Get Started | Claryeo',
@@ -33,8 +42,8 @@ class GetStartedController extends Controller
                     'plans' => $pricing['plans'] ?? [],
                     'appUrl' => rtrim(Config::string('services.claryeo_app.url'), '/'),
                     'contactUrl' => '/contact',
-                    'initialPlan' => $initialPlan !== '' ? $initialPlan : null,
-                    'initialInterval' => $initialInterval !== '' ? $initialInterval : null,
+                    'initialPlan' => $initialPlan,
+                    'initialInterval' => $initialInterval,
                 ]),
                 ENT_QUOTES,
                 'UTF-8'

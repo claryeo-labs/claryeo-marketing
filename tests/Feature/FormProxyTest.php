@@ -90,6 +90,18 @@ class FormProxyTest extends TestCase
         $this->assertNull($props['initialPlan']);
     }
 
+    public function test_get_started_sanitizes_invalid_query_parameters(): void
+    {
+        Http::fake(['web.test/api/internal/pricing' => Http::response(['data' => ['plans' => []]])]);
+
+        $response = $this->get('/get-started?plan=<script>alert(1)</script>&billing_interval=invalid');
+
+        $response->assertOk();
+        $props = $this->decodeIslandProps($response->getContent(), 'get-started');
+        $this->assertNull($props['initialPlan']);
+        $this->assertNull($props['initialInterval']);
+    }
+
     /**
      * Decode the HTML-escaped JSON from a named island's data-props attribute.
      *
