@@ -21,6 +21,11 @@ class BlogViewController extends Controller
             return response()->noContent();
         }
 
+        // Validate $id length and character set to prevent session pollution or untrusted input processing
+        if (strlen($id) > 128 || preg_match('/^[a-zA-Z0-9\-_]+$/', $id) !== 1) {
+            return response()->noContent();
+        }
+
         $key = 'blog_viewed_'.$id;
 
         if ($request->session()->has($key)) {
@@ -30,7 +35,7 @@ class BlogViewController extends Controller
         $entry = Entry::find($id);
 
         if ($entry instanceof EntryItem && $entry->collectionHandle() === 'blog' && $entry->published()) {
-            $views->record($id);
+            $views->record($entry->id());
             $request->session()->put($key, true);
         }
 
