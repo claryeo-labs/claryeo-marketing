@@ -251,7 +251,7 @@ export const Chapters = () => {
                         <br />
                         <em>Before we begin.</em>
                     </p>
-                    <a href="mailto:hello@claryeo.com" className="text-link" data-testid="faq-contact">
+                    <a href="/contact" className="text-link" data-testid="faq-contact">
                         Something else on your mind? Say hello <ArrowRight size={16} />
                     </a>
                 </Reveal>
