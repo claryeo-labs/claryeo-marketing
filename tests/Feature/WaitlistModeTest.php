@@ -36,7 +36,6 @@ class WaitlistModeTest extends TestCase
             'blog post' => ['/blog/vat-for-nigerian-small-businesses'],
             'guides' => ['/guides'],
             'glossary' => ['/glossary'],
-            'contact' => ['/contact'],
             'tax calculator' => ['/tax-calculator'],
             'old waitlist page' => ['/waitlist'],
             'unknown url' => ['/totally-unknown-page'],
@@ -147,6 +146,21 @@ class WaitlistModeTest extends TestCase
 
         $this->get('/privacy')->assertOk()->assertSee('data-island="legal-document"', false);
         $this->get('/privacy/versions')->assertOk();
+    }
+
+    public function test_waitlist_mode_lets_the_contact_pages_through(): void
+    {
+        config()->set('marketing.waitlist_mode', true);
+
+        $this->get('/contact')->assertOk()->assertSee('data-island="contact-form"', false);
+        $this->get('/contact/thank-you')->assertOk();
+    }
+
+    public function test_waitlist_landing_says_hello_through_the_contact_form(): void
+    {
+        config()->set('marketing.waitlist_mode', true);
+
+        $this->get('/')->assertSee('href="/contact"', false)->assertDontSee('mailto:hello@claryeo.com', false);
     }
 
     public function test_waitlist_mode_lets_the_proxy_endpoints_and_control_panel_through(): void
