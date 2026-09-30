@@ -34,16 +34,6 @@ function sumAnnualizedLineItems(
     }, 0);
 }
 
-function calculateProgressiveTax(
-    taxableIncome: number,
-    bands: TaxBand[],
-): number {
-    return calculateProgressiveBandAllocations(taxableIncome, bands).reduce(
-        (total, allocation) => total + allocation.taxAmount,
-        0,
-    );
-}
-
 function calculateProgressiveBandAllocations(
     taxableIncome: number,
     bands: TaxBand[],
@@ -146,9 +136,14 @@ export function calculateEmployeePaye(
               taxableIncome,
               input.profile.paye.bands,
           );
+    // Performance optimization: Sum tax amounts directly from existing allocations
+    // instead of re-allocating bands via calculateProgressiveTax().
     const paye = isMinimumWageExempt
         ? 0
-        : calculateProgressiveTax(taxableIncome, input.profile.paye.bands);
+        : payeBandAllocations.reduce(
+              (total, allocation) => total + allocation.taxAmount,
+              0,
+          );
 
     const netPay = grossEmolument - deductibleLines - paye;
     const taxableIncomeAtChargeableRates = payeBandAllocations.reduce(
