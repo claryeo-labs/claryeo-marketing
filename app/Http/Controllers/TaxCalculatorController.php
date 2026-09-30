@@ -69,7 +69,7 @@ class TaxCalculatorController extends Controller
             'consent_contact' => ['required', 'accepted'],
             'consent_marketing' => ['nullable', 'boolean'],
             'document_type' => ['nullable', 'string', 'max:255'],
-            'payload' => ['required', 'array'],
+            'payload' => ['required', 'array', 'max:50'],
         ]);
 
         $payload = [

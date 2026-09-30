@@ -39,6 +39,7 @@ class WaitlistTakeover
         'privacy', 'privacy/*',
         'terms', 'terms/*',
         'cookies', 'cookies/*',
+        'contact', 'contact/*',
         'sitemap.xml',
         'robots.txt',
         'llms.txt',
