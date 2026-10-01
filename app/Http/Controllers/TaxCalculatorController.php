@@ -9,6 +9,7 @@ use App\Support\SalaryPages;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class TaxCalculatorController extends Controller
@@ -76,7 +77,7 @@ class TaxCalculatorController extends Controller
             ...$validated,
             ...CaptureUtmParameters::resolve($request),
             'client_ip' => $request->ip(),
-            'client_user_agent' => $request->userAgent(),
+            'client_user_agent' => Str::limit((string) $request->userAgent(), 512, ''),
         ];
 
         $response = $this->api->submitTaxReport($payload);
