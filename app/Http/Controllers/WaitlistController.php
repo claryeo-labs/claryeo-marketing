@@ -9,6 +9,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response as ClientResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /**
  * The waitlist experience (ported from claryeo-waitlist) and its same-origin
@@ -102,7 +103,7 @@ class WaitlistController extends Controller
             ...$request->only(['name', 'email', 'company', 'answers', 'consent']),
             ...CaptureUtmParameters::resolve($request),
             'client_ip' => $request->ip(),
-            'client_user_agent' => $request->userAgent(),
+            'client_user_agent' => Str::limit((string) $request->userAgent(), 512, ''),
         ];
 
         try {

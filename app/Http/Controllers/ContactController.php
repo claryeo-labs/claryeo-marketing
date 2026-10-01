@@ -8,6 +8,7 @@ use App\Support\Faqs;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ContactController extends Controller
 {
@@ -45,7 +46,7 @@ class ContactController extends Controller
             ...$request->only(['first_name', 'last_name', 'email', 'phone', 'message']),
             ...CaptureUtmParameters::resolve($request),
             'client_ip' => $request->ip(),
-            'client_user_agent' => $request->userAgent(),
+            'client_user_agent' => Str::limit((string) $request->userAgent(), 512, ''),
         ];
 
         $response = $this->api->submitContact($payload);

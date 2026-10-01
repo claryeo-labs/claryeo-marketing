@@ -47,6 +47,32 @@ class TaxCalculatorTest extends TestCase
             && $request['client_ip'] !== null);
     }
 
+    public function test_report_truncates_oversized_user_agent(): void
+    {
+        Http::fake([
+            'web.test/api/internal/tax-calculator/report' => Http::response([
+                'message' => 'Sent.',
+                'data' => ['sent_to_masked' => 'a***@example.com'],
+            ]),
+        ]);
+
+        $longUserAgent = str_repeat('C', 600);
+
+        $response = $this
+            ->withHeader('User-Agent', $longUserAgent)
+            ->postJson('/tax-calculator/report', [
+                'email' => 'ada@example.com',
+                'consent_contact' => true,
+                'document_type' => 'tax_calculator_estimate',
+                'payload' => ['calculator_mode' => 'employee_paye'],
+            ]);
+
+        $response->assertOk();
+
+        Http::assertSent(fn (Request $request): bool => strlen((string) $request['client_user_agent']) === 512
+            && $request['client_user_agent'] === str_repeat('C', 512));
+    }
+
     public function test_report_validates_input_locally_before_calling_internal_api(): void
     {
         Http::fake();
