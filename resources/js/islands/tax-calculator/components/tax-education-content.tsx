@@ -1,6 +1,12 @@
 import type { FC } from 'react';
+import { memo } from 'react';
 
-const TaxEducationContent: FC = () => (
+/**
+ * Performance optimization: Wrap static tax education content with React.memo()
+ * to prevent unnecessary re-renders of this large static DOM tree during high-frequency
+ * keystrokes and option toggles on TaxCalculatorPage.
+ */
+const TaxEducationContent: FC = memo(() => (
     <div className="mx-auto mt-16 max-w-4xl space-y-12 px-4 text-foreground">
         <section>
             <h2 className="t-display-3">
@@ -226,6 +232,8 @@ const TaxEducationContent: FC = () => (
             </p>
         </section>
     </div>
-);
+));
+
+TaxEducationContent.displayName = 'TaxEducationContent';
 
 export default TaxEducationContent;
