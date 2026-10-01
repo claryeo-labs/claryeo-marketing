@@ -14,3 +14,7 @@
 ## 2026-08-23 - O(1) Month Label Lookup for Date Formatting
 **Learning:** Calling `new Date(y, m).toLocaleDateString()` inside frequent render or tooltip loops incurs huge `Intl.DateTimeFormat` overhead (~9.5s per 100k calls). Static array lookups (`MONTHS[index] + ' ' + y.slice(-2)`) execute in ~34ms per 100k calls (~270x faster) without object instantiation.
 **Action:** Replace `toLocaleDateString` in high-frequency React render cycles or chart tooltips with direct array index lookups or string slicing when formatting known date patterns like "YYYY-MM".
+
+## 2026-10-01 - Encapsulation of High-Frequency Timer State in Subcomponents
+**Learning:** High-frequency intervals (e.g. an 85ms typewriter cycle running ~11.7 Hz) placed at the root level of large container components like `LandingHero` trigger re-renders of the entire container tree and all child elements every tick. Encapsulating the animated state and interval inside a dedicated leaf subcomponent (`TypewriterWord`) isolates state updates and eliminates re-renders of parent JSX trees.
+**Action:** Isolate high-frequency interval or animation state into dedicated leaf subcomponents rather than declaring state at container scope.

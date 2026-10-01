@@ -39,6 +39,25 @@ class FormProxyTest extends TestCase
             && $request['client_ip'] !== null);
     }
 
+    public function test_contact_store_truncates_oversized_user_agent(): void
+    {
+        Http::fake(['web.test/api/internal/contact' => Http::response(['data' => ['id' => 8]], 201)]);
+
+        $longUserAgent = str_repeat('A', 600);
+
+        $response = $this
+            ->withHeader('User-Agent', $longUserAgent)
+            ->postJson('/contact', [
+                'email' => 'ada@example.com',
+                'message' => 'Hello team, I would like help with my account.',
+            ]);
+
+        $response->assertCreated();
+
+        Http::assertSent(fn (Request $request): bool => strlen((string) $request['client_user_agent']) === 512
+            && $request['client_user_agent'] === str_repeat('A', 512));
+    }
+
     public function test_contact_store_relays_validation_errors(): void
     {
         Http::fake(['web.test/api/internal/contact' => Http::response([

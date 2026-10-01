@@ -69,6 +69,22 @@ class WaitlistProxyTest extends TestCase
         });
     }
 
+    public function test_store_truncates_oversized_user_agent(): void
+    {
+        Http::fake(['web.test/api/internal/waitlist' => Http::response(['status' => 'joined'])]);
+
+        $longUserAgent = str_repeat('B', 600);
+
+        $response = $this
+            ->withHeader('User-Agent', $longUserAgent)
+            ->postJson('/waitlist', $this->signup);
+
+        $response->assertOk();
+
+        Http::assertSent(fn (Request $request): bool => strlen((string) $request['client_user_agent']) === 512
+            && $request['client_user_agent'] === str_repeat('B', 512));
+    }
+
     public function test_store_rejects_a_filled_honeypot_without_calling_the_api(): void
     {
         Http::fake();

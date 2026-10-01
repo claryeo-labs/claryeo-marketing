@@ -24,36 +24,13 @@ const HOLD_TICKS = 20;
 // object creation on every income input keystroke.
 const enNgIntegerFormatter = new Intl.NumberFormat('en-NG');
 
-type LandingHeroProps = {
-    getStartedUrl: string;
-    waitlistUrl: string;
-    waitlistMode: boolean;
-};
-
-const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlistMode }) => {
-    const rootRef = useRef<HTMLDivElement>(null);
-    const [income, setIncome] = useState('');
+/**
+ * Performance optimization: Encapsulate typewriter interval and state in a
+ * dedicated subcomponent. Prevents LandingHero (and its subcomponents) from
+ * re-rendering every 85ms (~11.7 Hz) during the word cycling animation.
+ */
+const TypewriterWord: FC = () => {
     const [typed, setTyped] = useState(PILLARS[0].word);
-
-    // Layout effect, not effect: the tween's `from` values must land before
-    // the browser paints, or the hero flashes in fully-formed and then
-    // snaps back to opacity 0 to animate.
-    useLayoutEffect(() => {
-        if (!rootRef.current || prefersReducedMotion()) return;
-
-        const targets = rootRef.current.querySelectorAll('[data-hero-in]');
-        const animation = animate(targets, {
-            opacity: [0, 1],
-            translateY: [16, 0],
-            duration: 700,
-            delay: stagger(90, { start: 150 }),
-            ease: 'outQuart',
-        });
-
-        return () => {
-            animation.revert();
-        };
-    }, []);
 
     // One interval drives the whole cycle: type out, linger, erase, next word.
     // Reduced-motion users keep the first word, permanently.
@@ -83,6 +60,39 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
         }, TYPE_MS);
 
         return () => clearInterval(id);
+    }, []);
+
+    return <em className="">{typed}</em>;
+};
+
+type LandingHeroProps = {
+    getStartedUrl: string;
+    waitlistUrl: string;
+    waitlistMode: boolean;
+};
+
+const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlistMode }) => {
+    const rootRef = useRef<HTMLDivElement>(null);
+    const [income, setIncome] = useState('');
+
+    // Layout effect, not effect: the tween's `from` values must land before
+    // the browser paints, or the hero flashes in fully-formed and then
+    // snaps back to opacity 0 to animate.
+    useLayoutEffect(() => {
+        if (!rootRef.current || prefersReducedMotion()) return;
+
+        const targets = rootRef.current.querySelectorAll('[data-hero-in]');
+        const animation = animate(targets, {
+            opacity: [0, 1],
+            translateY: [16, 0],
+            duration: 700,
+            delay: stagger(90, { start: 150 }),
+            ease: 'outQuart',
+        });
+
+        return () => {
+            animation.revert();
+        };
     }, []);
 
     // Grouped as you type. A native number input can't render separators, so
@@ -124,9 +134,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                     <br />
                     Run your business with 
                     <br />
-                    <em className="">
-                    
-                        {typed}</em>
+                    <TypewriterWord />
                     <span aria-hidden className="ml-0.5 animate-pulse font-sans font-light">|</span>
                     <span className="sr-only">confidence, clarity and control.</span>
                 </h1>
