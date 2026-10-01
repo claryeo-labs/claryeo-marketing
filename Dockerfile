@@ -4,7 +4,7 @@
 FROM php:8.3-fpm-alpine AS base
 
 LABEL org.opencontainers.image.title="Claryeo Marketing"
-LABEL org.opencontainers.image.source="https://github.com/jemmy344/claryeo-marketing"
+LABEL org.opencontainers.image.source="https://github.com/claryeo-labs/claryeo-marketing"
 
 RUN apk add --no-cache \
         curl \
