@@ -677,12 +677,12 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
                                                                 );
                                                             }
                                                         }}
-                                                        className="h-7 w-20 rounded-md border border-border bg-background px-2 text-right text-xs font-semibold text-foreground"
+                                                        className="h-7 w-20 rounded-md border border-border bg-background px-2 text-right text-xs font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                                     />
                                                 ) : (
                                                     <button
                                                         type="button"
-                                                        onDoubleClick={() => {
+                                                        onClick={() => {
                                                             setAiCreditsDraft(
                                                                 String(
                                                                     selectedAiCredits,
@@ -692,8 +692,9 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
                                                                 true,
                                                             );
                                                         }}
-                                                        className="rounded-md px-1 text-xs font-semibold text-foreground underline-offset-4 hover:underline"
-                                                        title="Double-click to edit"
+                                                        className="rounded-md px-1 text-xs font-semibold text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                                        aria-label={`AI credit count: ${formatCredits(selectedAiCredits)}. Click to edit`}
+                                                        title="Click to edit"
                                                     >
                                                         {formatCredits(
                                                             selectedAiCredits,
@@ -848,12 +849,12 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
                                                                 );
                                                             }
                                                         }}
-                                                        className="h-7 w-20 rounded-md border border-border bg-background px-2 text-right text-xs font-semibold text-foreground"
+                                                        className="h-7 w-20 rounded-md border border-border bg-background px-2 text-right text-xs font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                                     />
                                                 ) : (
                                                     <button
                                                         type="button"
-                                                        onDoubleClick={() => {
+                                                        onClick={() => {
                                                             setAiCreditsDraft(
                                                                 String(
                                                                     selectedAiCredits,
@@ -863,8 +864,9 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
                                                                 true,
                                                             );
                                                         }}
-                                                        className="rounded-md px-1 text-xs font-semibold text-foreground underline-offset-4 hover:underline"
-                                                        title="Double-click to edit"
+                                                        className="rounded-md px-1 text-xs font-semibold text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                                        aria-label={`AI credit count: ${formatCredits(selectedAiCredits)}. Click to edit`}
+                                                        title="Click to edit"
                                                     >
                                                         {formatCredits(
                                                             selectedAiCredits,
