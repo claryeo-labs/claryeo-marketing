@@ -68,7 +68,7 @@ class TaxCalculatorController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'consent_contact' => ['required', 'accepted'],
             'consent_marketing' => ['nullable', 'boolean'],
-            'document_type' => ['nullable', 'string', 'max:255'],
+            'document_type' => ['nullable', 'string', 'max:64', 'regex:/^[a-zA-Z0-9\-_]+$/'],
             'payload' => ['required', 'array', 'max:50'],
         ]);
 
