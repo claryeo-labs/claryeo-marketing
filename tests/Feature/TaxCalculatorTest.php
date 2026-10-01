@@ -92,4 +92,31 @@ class TaxCalculatorTest extends TestCase
 
         Http::assertNothingSent();
     }
+
+    public function test_report_rejects_invalid_document_type(): void
+    {
+        Http::fake();
+
+        // Test invalid character pattern
+        $this->postJson('/tax-calculator/report', [
+            'email' => 'ada@example.com',
+            'consent_contact' => true,
+            'document_type' => 'invalid/document/type',
+            'payload' => ['calculator_mode' => 'employee_paye'],
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['document_type']);
+
+        // Test excessive length
+        $this->postJson('/tax-calculator/report', [
+            'email' => 'ada@example.com',
+            'consent_contact' => true,
+            'document_type' => str_repeat('a', 65),
+            'payload' => ['calculator_mode' => 'employee_paye'],
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['document_type']);
+
+        Http::assertNothingSent();
+    }
 }
