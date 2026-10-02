@@ -113,11 +113,22 @@ const SiteNav: FC<SiteNavProps> = ({
 
     // Dark-hero pages (landing): header starts transparent over the hero
     // atmosphere and picks up a glass backdrop once scrolled past it.
+    // Performance optimization: Track threshold state locally so setScrolled
+    // is only invoked when crossing the 32px boundary rather than on every scroll tick.
     useEffect(() => {
         if (!isDark) return;
 
-        const onScroll = (): void => setScrolled(window.scrollY > 32);
-        onScroll();
+        let isScrolled = window.scrollY > 32;
+        setScrolled(isScrolled);
+
+        const onScroll = (): void => {
+            const next = window.scrollY > 32;
+            if (next !== isScrolled) {
+                isScrolled = next;
+                setScrolled(next);
+            }
+        };
+
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, [isDark]);
