@@ -38,6 +38,9 @@ Route::view('blog', 'blog.index', [
 ])->name('blog');
 
 Route::get('blog/category/{category}', function (string $category) {
+    // Validate $category length and character set before processing or checking config
+    abort_if(strlen($category) > 64 || preg_match('/^[a-zA-Z0-9\-_]+$/', $category) !== 1, 404);
+
     /** @var array<string, string> $categories */
     $categories = (array) config('marketing.blog_categories', []);
 

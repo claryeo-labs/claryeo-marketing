@@ -50,6 +50,15 @@ class BlogPageTest extends TestCase
         $this->get('/blog/category/does-not-exist')->assertNotFound();
     }
 
+    public function test_invalid_or_oversized_category_parameter_is_not_found(): void
+    {
+        $oversizedCategory = str_repeat('a', 70);
+
+        $this->get('/blog/category/invalid%20category!')->assertNotFound();
+        $this->get('/blog/category/<script>alert(1)</script>')->assertNotFound();
+        $this->get("/blog/category/{$oversizedCategory}")->assertNotFound();
+    }
+
     public function test_single_post_renders_content(): void
     {
         $this->get('/blog/vat-for-nigerian-small-businesses')
