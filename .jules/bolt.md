@@ -18,3 +18,7 @@
 ## 2026-10-01 - Encapsulation of High-Frequency Timer State in Subcomponents
 **Learning:** High-frequency intervals (e.g. an 85ms typewriter cycle running ~11.7 Hz) placed at the root level of large container components like `LandingHero` trigger re-renders of the entire container tree and all child elements every tick. Encapsulating the animated state and interval inside a dedicated leaf subcomponent (`TypewriterWord`) isolates state updates and eliminates re-renders of parent JSX trees.
 **Action:** Isolate high-frequency interval or animation state into dedicated leaf subcomponents rather than declaring state at container scope.
+
+## 2026-10-15 - Singleton Binding and Request-Level In-Memory Memoization for Global Mode Lookups
+**Learning:** `SiteMode::waitlist()` was evaluated repeatedly across middleware (`WaitlistTakeover`) and global view composers (`View::composer('*')`) for every template partial rendered during a web request. Registering `SiteMode` as a container singleton in `AppServiceProvider` and adding in-memory request-level memoization (`$this->cachedWaitlist ??= ...`) eliminates repeated `Cache::get()` and `Cache::has()` driver operations across multi-partial page renders.
+**Action:** Register global mode/flag services as singletons and memoize their resolved state in instance properties to bypass repeated cache queries across middleware and view composers.
