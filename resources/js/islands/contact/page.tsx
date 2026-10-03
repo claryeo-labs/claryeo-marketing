@@ -307,11 +307,16 @@ const Contact: FC<ContactProps> = ({
                                     maxLength={MESSAGE_MAX}
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
+                                    aria-describedby="message-counter"
                                     className="min-h-36 resize-none rounded-xl border-border bg-background"
                                 />
                                 <div className="flex items-start justify-between gap-3">
                                     <InputError message={errors.message?.[0]} />
-                                    <span className="t-mono ml-auto shrink-0 text-xs text-muted-foreground">
+                                    <span
+                                        id="message-counter"
+                                        aria-live="polite"
+                                        className="t-mono ml-auto shrink-0 text-xs text-muted-foreground"
+                                    >
                                         {message.length}/{MESSAGE_MAX}
                                     </span>
                                 </div>
