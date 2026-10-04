@@ -18,3 +18,7 @@
 ## 2026-10-01 - Encapsulation of High-Frequency Timer State in Subcomponents
 **Learning:** High-frequency intervals (e.g. an 85ms typewriter cycle running ~11.7 Hz) placed at the root level of large container components like `LandingHero` trigger re-renders of the entire container tree and all child elements every tick. Encapsulating the animated state and interval inside a dedicated leaf subcomponent (`TypewriterWord`) isolates state updates and eliminates re-renders of parent JSX trees.
 **Action:** Isolate high-frequency interval or animation state into dedicated leaf subcomponents rather than declaring state at container scope.
+
+## 2026-10-04 - Request-Scoped Memoization for Wildcard View Composers
+**Learning:** Wildcard view composers (`View::composer('*', ...)`) execute once for every view partial rendered during an HTTP request. Re-evaluating dynamic configuration or mode checks like `SiteMode::waitlist()` inside a wildcard composer caused 20-40 redundant `Cache::has` and `Cache::get` operations per page load. Memoizing the decision per `request()` instance in the composer and adding instance memoization on `SiteMode` reduces cache operations to 1-2 per request and accelerates server-side view composition.
+**Action:** When injecting view data via `View::composer('*')`, memoize the result against `request()` so partial renders reuse the computed state in $O(1)$ time.

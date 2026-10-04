@@ -25,19 +25,29 @@ class SiteMode
 
     private const LAST_KNOWN_KEY = 'marketing:site:waitlist_mode:last';
 
+    // Performance optimization: Cache the waitlist decision in memory for the
+    // lifetime of this instance so repeated calls (e.g. across middleware,
+    // controllers, and view composers) execute in O(1) time without redundant
+    // Cache driver lookups.
+    private ?bool $cachedWaitlist = null;
+
     public function __construct(private readonly MainApi $api) {}
 
     public function waitlist(): bool
     {
+        if ($this->cachedWaitlist !== null) {
+            return $this->cachedWaitlist;
+        }
+
         $remote = $this->remoteWaitlistMode();
 
         if ($remote !== null) {
-            return $remote;
+            return $this->cachedWaitlist = $remote;
         }
 
         $lastKnown = Cache::get(self::LAST_KNOWN_KEY);
 
-        return is_bool($lastKnown) ? $lastKnown : Config::boolean('marketing.waitlist_mode');
+        return $this->cachedWaitlist = (is_bool($lastKnown) ? $lastKnown : Config::boolean('marketing.waitlist_mode'));
     }
 
     private function remoteWaitlistMode(): ?bool

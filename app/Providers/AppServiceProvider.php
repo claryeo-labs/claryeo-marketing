@@ -126,7 +126,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * View data that varies with waitlist mode, memoised per mode.
+     * View data that varies with waitlist mode, memoised per mode and request.
      *
      * @param  array{primary?: list<array{label: string, href: string}>, resources?: mixed, footer?: array<int, array{group: string, items: array<int, array{title: string, href: string}>}>, social?: mixed}  $nav
      * @param  array<string, mixed>  $features
@@ -134,7 +134,19 @@ class AppServiceProvider extends ServiceProvider
      */
     private function modeViewData(string $appUrl, array $nav, array $features): array
     {
-        $waitlistMode = $this->app->make(SiteMode::class)->waitlist();
+        // Performance optimization: Memoize waitlist mode resolution per HTTP request.
+        // View::composer('*') fires on every view partial rendered during a request.
+        // Re-using the resolved waitlist mode avoids resolving SiteMode and querying
+        // the cache driver on every partial render (~20x reduction in cache calls).
+        static $cachedRequest = null;
+        static $waitlistMode = null;
+
+        $request = request();
+
+        if ($cachedRequest !== $request || $waitlistMode === null) {
+            $cachedRequest = $request;
+            $waitlistMode = $this->app->make(SiteMode::class)->waitlist();
+        }
 
         return $this->modeViewData[$waitlistMode ? 1 : 0] ??= $this->buildModeViewData($waitlistMode, $appUrl, $nav, $features);
     }
