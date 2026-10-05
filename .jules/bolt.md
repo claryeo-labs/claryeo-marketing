@@ -18,3 +18,7 @@
 ## 2026-10-01 - Encapsulation of High-Frequency Timer State in Subcomponents
 **Learning:** High-frequency intervals (e.g. an 85ms typewriter cycle running ~11.7 Hz) placed at the root level of large container components like `LandingHero` trigger re-renders of the entire container tree and all child elements every tick. Encapsulating the animated state and interval inside a dedicated leaf subcomponent (`TypewriterWord`) isolates state updates and eliminates re-renders of parent JSX trees.
 **Action:** Isolate high-frequency interval or animation state into dedicated leaf subcomponents rather than declaring state at container scope.
+
+## 2026-10-15 - Deriving O(1) Static Lookup Maps for Global Middleware Route Allowlists
+**Learning:** Global middleware like `WaitlistTakeover` executed `$request->is(...self::ALLOWLIST)` on every single request, iterating through array patterns and executing regex matches. Dynamically deriving an $O(1)$ exact-match lookup map (`$exactAllowlist = array_fill_keys(array_filter(...), true)`) on initial load from the constant allows exact requests (e.g. `/`, `/quiz`, `/sitemap.xml`) to bypass pattern matching while maintaining `ALLOWLIST` as a single source of truth.
+**Action:** In global middleware path-matching routines, dynamically derive exact-match hash maps from string constants on first access to accelerate non-wildcard requests without duplicating configuration.

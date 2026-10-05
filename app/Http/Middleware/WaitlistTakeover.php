@@ -66,6 +66,12 @@ class WaitlistTakeover
      */
     public const WAITLIST_PAGES = ['quiz', 'result', 'waitlist'];
 
+    /** @var array<string, true>|null */
+    private static ?array $exactAllowlist = null;
+
+    /** @var array<string, true>|null */
+    private static ?array $exactWaitlistPages = null;
+
     public function __construct(private readonly SiteMode $siteMode) {}
 
     /**
@@ -81,13 +87,32 @@ class WaitlistTakeover
             return $this->isAllowed($request) ? $next($request) : $this->redirectTo('/', $request);
         }
 
-        return $request->is(...self::WAITLIST_PAGES)
+        // Performance optimization: Check exact waitlist page paths via O(1) hash map lookup
+        // instead of unrolling arrays and running string/regex comparisons on every request.
+        self::$exactWaitlistPages ??= array_fill_keys(self::WAITLIST_PAGES, true);
+
+        return isset(self::$exactWaitlistPages[$request->path()])
             ? $this->redirectTo('/get-started', $request)
             : $next($request);
     }
 
     private function isAllowed(Request $request): bool
     {
+        // Performance optimization: Automatically derive an O(1) hash map of exact paths
+        // from ALLOWLIST on initial load to avoid array scanning and regex matching on exact hits,
+        // maintaining ALLOWLIST as the single source of truth.
+        if (self::$exactAllowlist === null) {
+            $exacts = array_filter(
+                self::ALLOWLIST,
+                fn (string $pattern): bool => ! str_contains($pattern, '*') && ! str_contains($pattern, '!'),
+            );
+            self::$exactAllowlist = array_fill_keys($exacts, true);
+        }
+
+        if (isset(self::$exactAllowlist[$request->path()])) {
+            return true;
+        }
+
         $cp = trim(Config::string('statamic.cp.route', 'cp'), '/');
 
         return $request->is(...self::ALLOWLIST) || $request->is($cp, $cp.'/*');
