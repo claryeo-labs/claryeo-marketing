@@ -87,8 +87,8 @@ class WaitlistController extends Controller
     }
 
     /**
-     * POST /waitlist: check the honeypot, add attribution, proxy to the main
-     * app and relay its status + body unchanged (validation lives there).
+     * POST /waitlist: check the honeypot, validate inputs for defense in depth,
+     * add attribution, proxy to the main app and relay its status + body.
      */
     public function store(Request $request): JsonResponse
     {
@@ -99,8 +99,18 @@ class WaitlistController extends Controller
             return response()->json(['detail' => self::HONEYPOT], 422);
         }
 
+        // Validate payload boundary to prevent forwarding malformed or oversized
+        // inputs to internal API (defense in depth & DoS mitigation).
+        $validated = $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'company' => ['nullable', 'string', 'max:255'],
+            'answers' => ['nullable', 'array', 'max:50'],
+            'consent' => ['nullable'],
+        ]);
+
         $payload = [
-            ...$request->only(['name', 'email', 'company', 'answers', 'consent']),
+            ...$validated,
             ...CaptureUtmParameters::resolve($request),
             'client_ip' => $request->ip(),
             'client_user_agent' => Str::limit((string) $request->userAgent(), 512, ''),
