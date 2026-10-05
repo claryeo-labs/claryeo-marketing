@@ -27,6 +27,13 @@ class CanonicalHostTest extends TestCase
             ->assertRedirect('https://claryeo.com/guides/paye-tax-nigeria?utm_source=x&page=2');
     }
 
+    public function test_www_redirect_preserves_query_params_containing_www(): void
+    {
+        $this->get('https://www.claryeo.com/about?ref=https://www.external.com')
+            ->assertStatus(301)
+            ->assertRedirect('https://claryeo.com/about?ref=https://www.external.com');
+    }
+
     public function test_bare_host_is_served_and_not_redirected(): void
     {
         $this->get('https://claryeo.com/')->assertOk();
