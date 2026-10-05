@@ -15,6 +15,7 @@ class BlogPageTest extends TestCase
         parent::setUp();
 
         $this->withoutVite();
+        config(['marketing.waitlist_mode' => false]);
     }
 
     public function test_index_lists_published_posts(): void
@@ -156,5 +157,25 @@ class BlogPageTest extends TestCase
             ->assertSee('Keep reading')
             ->assertSee('Separate but Equal')
             ->assertDontSee('5 invoicing mistakes that delay your payments');
+    }
+
+    public function test_page_url_canonicalizes_valid_page_numbers(): void
+    {
+        $this->get('/blog?page=2')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.url('/blog').'?page=2">', false);
+    }
+
+    public function test_page_url_ignores_invalid_page_parameters(): void
+    {
+        $this->get('/blog?page=-1')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.url('/blog').'">', false)
+            ->assertDontSee('?page=-1');
+
+        $this->get('/blog?page=invalid<script>')
+            ->assertOk()
+            ->assertSee('<link rel="canonical" href="'.url('/blog').'">', false)
+            ->assertDontSee('invalid<script>');
     }
 }
