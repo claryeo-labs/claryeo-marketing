@@ -70,6 +70,18 @@ class FormProxyTest extends TestCase
             ->assertJsonPath('errors.email.0', 'The email field must be a valid email address.');
     }
 
+    public function test_contact_store_answers_503_when_api_unreachable(): void
+    {
+        Http::fake(['web.test/api/internal/contact' => fn () => throw new \Illuminate\Http\Client\ConnectionException('Connection failed')]);
+
+        $this->postJson('/contact', [
+            'email' => 'ada@example.com',
+            'message' => 'Hello team, I would like help with my account.',
+        ])
+            ->assertStatus(503)
+            ->assertJsonPath('detail', 'We couldn’t reach Claryeo. Please try again in a moment.');
+    }
+
     public function test_get_started_renders_island_with_plans_and_app_handoff(): void
     {
         Http::fake([

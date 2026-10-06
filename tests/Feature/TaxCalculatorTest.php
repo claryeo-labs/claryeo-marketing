@@ -102,6 +102,21 @@ class TaxCalculatorTest extends TestCase
             ->assertJsonPath('errors.payload.0', 'Malformed payload.');
     }
 
+    public function test_report_answers_503_when_api_unreachable(): void
+    {
+        Http::fake([
+            'web.test/api/internal/tax-calculator/report' => fn () => throw new \Illuminate\Http\Client\ConnectionException('Connection failed'),
+        ]);
+
+        $this->postJson('/tax-calculator/report', [
+            'email' => 'ada@example.com',
+            'consent_contact' => true,
+            'payload' => ['calculator_mode' => 'employee_paye'],
+        ])
+            ->assertStatus(503)
+            ->assertJsonPath('detail', 'We couldn’t reach Claryeo. Please try again in a moment.');
+    }
+
     public function test_report_rejects_excessive_payload_array_items(): void
     {
         Http::fake();
