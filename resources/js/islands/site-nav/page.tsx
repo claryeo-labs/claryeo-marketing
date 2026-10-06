@@ -53,8 +53,8 @@ const SiteNav: FC<SiteNavProps> = ({
     const isDark = theme === 'dark';
 
     const linkClass = isDark
-        ? 'text-sm text-paper/80 transition-colors hover:text-paper'
-        : 'text-sm text-muted-foreground transition-colors hover:text-foreground';
+        ? 'rounded-xs text-sm text-paper/80 transition-colors hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+        : 'rounded-xs text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
     // In waitlist mode, pricing/get-started links are removed from the menus.
     // Performance optimization: Memoize filtered columns and support array derivations
@@ -206,7 +206,7 @@ const SiteNav: FC<SiteNavProps> = ({
             <nav className="mx-auto flex h-14 w-full max-w-[1180px] items-center justify-between px-4 md:px-0">
                 <a
                     href="/"
-                    className="flex items-center gap-3 transition-opacity hover:opacity-90"
+                    className="flex items-center gap-3 rounded-md transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                     <img
                         src="/favicon.svg"
@@ -240,7 +240,7 @@ const SiteNav: FC<SiteNavProps> = ({
                             <a
                                 href={loginHref}
                                 className={cn(
-                                    'rounded-full px-4 py-2 text-sm transition-colors',
+                                    'rounded-full px-4 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                                     isDark
                                         ? 'text-paper/80 hover:bg-paper/10 hover:text-paper'
                                         : 'text-muted-foreground hover:bg-muted hover:text-foreground',
@@ -252,7 +252,7 @@ const SiteNav: FC<SiteNavProps> = ({
                         <a
                             href={cta.href}
                             className={cn(
-                                'rounded-full px-4 py-2 text-sm font-medium shadow-sm transition-opacity hover:opacity-90',
+                                'rounded-full px-4 py-2 text-sm font-medium shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                                 isDark
                                     ? 'bg-paper text-ink'
                                     : 'bg-gradient-primary text-primary-foreground',
