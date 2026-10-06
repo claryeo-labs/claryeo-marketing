@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -105,7 +106,7 @@ class TaxCalculatorTest extends TestCase
     public function test_report_answers_503_when_api_unreachable(): void
     {
         Http::fake([
-            'web.test/api/internal/tax-calculator/report' => fn () => throw new \Illuminate\Http\Client\ConnectionException('Connection failed'),
+            'web.test/api/internal/tax-calculator/report' => fn () => throw new ConnectionException('Connection failed'),
         ]);
 
         $this->postJson('/tax-calculator/report', [

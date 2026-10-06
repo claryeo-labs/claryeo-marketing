@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -72,7 +73,7 @@ class FormProxyTest extends TestCase
 
     public function test_contact_store_answers_503_when_api_unreachable(): void
     {
-        Http::fake(['web.test/api/internal/contact' => fn () => throw new \Illuminate\Http\Client\ConnectionException('Connection failed')]);
+        Http::fake(['web.test/api/internal/contact' => fn () => throw new ConnectionException('Connection failed')]);
 
         $this->postJson('/contact', [
             'email' => 'ada@example.com',
