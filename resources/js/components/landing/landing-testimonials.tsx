@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
@@ -41,53 +42,62 @@ const gradients = [
     'from-dusk/35 via-dawn/25 to-transparent',
 ];
 
-const LandingTestimonials: FC = () => (
-    <section id="testimonials" className="bg-ink py-16 transition-colors duration-300 md:py-32">
-        <div className="mx-auto max-w-6xl space-y-8 px-6 md:space-y-16">
-            <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center">
-                <span className="t-eyebrow text-mist">
-                    Testimonials
-                </span>
-                <h2 className="t-display-2 text-paper">
-                    <em>Loved</em> by those who hate bookkeeping
-                </h2>
-                <p className="text-mist">
-                    Claryeo brings together invoicing, expenses, and tax summaries so you can
-                    focus on what you do best.
-                </p>
-            </div>
+/**
+ * Performance optimization: Wrap static testimonials grid with React.memo()
+ * to prevent unnecessary re-evaluations of this presentation tree during parent state
+ * updates or interactivity in adjacent landing section islands.
+ */
+const LandingTestimonials: FC = memo(function LandingTestimonials() {
+    return (
+        <section id="testimonials" className="bg-ink py-16 transition-colors duration-300 md:py-32">
+            <div className="mx-auto max-w-6xl space-y-8 px-6 md:space-y-16">
+                <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center">
+                    <span className="t-eyebrow text-mist">
+                        Testimonials
+                    </span>
+                    <h2 className="t-display-2 text-paper">
+                        <em>Loved</em> by those who hate bookkeeping
+                    </h2>
+                    <p className="text-mist">
+                        Claryeo brings together invoicing, expenses, and tax summaries so you can
+                        focus on what you do best.
+                    </p>
+                </div>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {testimonials.map((t, i) => (
-                    <div
-                        key={t.author}
-                        className={`relative overflow-hidden rounded-2xl border border-ink-border bg-linear-to-br p-6 ${gradients[i % gradients.length]} ${i === 0 ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2' : ''}`}
-                    >
-                        <div className="relative flex h-full flex-col justify-between gap-8">
-                            <p
-                                className={`text-paper ${i === 0 ? 'text-xl font-medium' : 'text-base'}`}
-                            >
-                                {t.quote}
-                            </p>
-                            <div className="flex items-center gap-3">
-                                <Avatar className={avatarClass}>
-                                    <AvatarFallback className="bg-transparent text-paper">
-                                        {t.fallback}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <cite className="block text-sm font-medium text-paper not-italic">
-                                        {t.author}
-                                    </cite>
-                                    <span className="block text-sm text-mist">{t.role}</span>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {testimonials.map((t, i) => (
+                        <div
+                            key={t.author}
+                            className={`relative overflow-hidden rounded-2xl border border-ink-border bg-linear-to-br p-6 ${gradients[i % gradients.length]} ${i === 0 ? 'sm:col-span-2 lg:col-span-2 lg:row-span-2' : ''}`}
+                        >
+                            <div className="relative flex h-full flex-col justify-between gap-8">
+                                <p
+                                    className={`text-paper ${i === 0 ? 'text-xl font-medium' : 'text-base'}`}
+                                >
+                                    {t.quote}
+                                </p>
+                                <div className="flex items-center gap-3">
+                                    <Avatar className={avatarClass}>
+                                        <AvatarFallback className="bg-transparent text-paper">
+                                            {t.fallback}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <cite className="block text-sm font-medium text-paper not-italic">
+                                            {t.author}
+                                        </cite>
+                                        <span className="block text-sm text-mist">{t.role}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
-        </div>
-    </section>
-);
+        </section>
+    );
+});
+
+LandingTestimonials.displayName = 'LandingTestimonials';
 
 export default LandingTestimonials;
