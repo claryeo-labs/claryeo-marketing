@@ -50,4 +50,10 @@ class FeaturePageTest extends TestCase
     {
         $this->get('/features/invoicing.highlights')->assertNotFound();
     }
+
+    public function test_invalid_slug_route_parameters_are_rejected(): void
+    {
+        $this->get('/features/invoicing<script>')->assertNotFound();
+        $this->get('/features/'.str_repeat('a', 65))->assertNotFound();
+    }
 }
