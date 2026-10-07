@@ -21,3 +21,7 @@
 ## 2026-10-15 - Double-click Editable Triggers Accessibility
 **Learning:** Requiring double-click (`onDoubleClick`) on buttons/triggers to activate inline editing renders the action inaccessible to keyboard and screen reader users because native button activation (Enter/Space keys) triggers `onClick`, not `onDoubleClick`.
 **Action:** Use single click (`onClick`) for editable text triggers or provide explicit edit icon buttons, and include `focus-visible:ring-2` along with informative `aria-label` instructions (`Click to edit`).
+
+## 2026-11-20 - WAI-ARIA Tablist Keyboard Navigation
+**Learning:** Interactive tab controls using `role="tablist"` and `role="tab"` elements require standard arrow key navigation (Left/Right/Up/Down, Home, End) and roving `tabIndex` management (`tabIndex={0}` on active tab, `-1` on inactive tabs). Without keydown event handlers to update selection and move DOM focus, keyboard users are forced to tab through every inactive tab individually.
+**Action:** Always attach `onKeyDown` handlers on `role="tab"` buttons that capture arrow keys/Home/End to cycle `active` tab state and explicitly call `focus()` on the newly selected tab element.
