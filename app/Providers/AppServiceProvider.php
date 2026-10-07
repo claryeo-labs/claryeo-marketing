@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
                 (string) $config->get('services.main_api.token'),
             );
         });
+
+        // Performance optimization: Bind SiteMode as a singleton so that all middleware and
+        // view composer invocations within an HTTP request share a single in-memory instance.
+        $this->app->singleton(SiteMode::class);
     }
 
     /**
@@ -88,8 +92,14 @@ class AppServiceProvider extends ServiceProvider
 
             // Paginated lists must self-canonicalise per page, or pages 2..n
             // tell Google to drop them in favour of page 1.
-            $view->with('page_url', is_scalar($page) && (string) $page !== '' && (string) $page !== '1'
-                ? $request->url().'?page='.rawurlencode((string) $page)
+            // Sanitize and validate $page to prevent URL parameter injection
+            // and canonical tag / Open Graph metadata URL pollution.
+            $isValidPageNumber = is_scalar($page)
+                && preg_match('/^[1-9][0-9]{0,5}$/', (string) $page) === 1
+                && (int) $page > 1;
+
+            $view->with('page_url', $isValidPageNumber
+                ? $request->url().'?page='.(string) $page
                 : $request->url());
         });
         View::share('site_root', url('/'));

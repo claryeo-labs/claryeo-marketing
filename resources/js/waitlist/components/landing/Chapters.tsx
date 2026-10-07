@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Check, ArrowRight } from 'lucide-react';
+import type { KeyboardEvent } from 'react';
 import { useState } from 'react';
 
 import { FeatureIcon, JoinButton } from '@/waitlist/components/Brand';
@@ -116,6 +117,30 @@ const steps = [
 export const Chapters = () => {
     const [active, setActive] = useState(0);
     const current = pains[active];
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
+        let nextIndex: number | null = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            e.preventDefault();
+            nextIndex = (index + 1) % pains.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            e.preventDefault();
+            nextIndex = (index - 1 + pains.length) % pains.length;
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            nextIndex = 0;
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            nextIndex = pains.length - 1;
+        }
+
+        if (nextIndex !== null) {
+            setActive(nextIndex);
+            const targetButton = document.getElementById(`pain-tab-${nextIndex}`);
+            targetButton?.focus();
+        }
+    };
+
     if (!current) return null;
     return (
         <>
@@ -146,13 +171,16 @@ export const Chapters = () => {
                         <div role="tablist" aria-label="Explore business pain points" className="pain-tabs">
                             {pains.map((pain, i) => (
                                 <button
+                                    type="button"
                                     role="tab"
                                     aria-selected={active === i}
                                     aria-controls="pain-feature-panel"
                                     id={`pain-tab-${i}`}
                                     key={pain.label}
+                                    tabIndex={active === i ? 0 : -1}
                                     className={`pain-tab ${active === i ? 'active' : ''}`}
                                     onClick={() => setActive(i)}
+                                    onKeyDown={(e) => handleKeyDown(e, i)}
                                     data-testid={`pain-tab-${i}`}
                                 >
                                     <FeatureIcon name={pain.icon} size={19} />
