@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
@@ -87,14 +87,16 @@ const LegalDocumentPage: FC<LegalDocumentPageProps> = ({
     version,
     currentVersion,
 }) => {
-    const toc = deriveToc(body);
+    // Performance optimization: Memoize table-of-contents extraction, content body cleaning,
+    // and date formatting so regexes and parsing don't re-run on active section state changes during scrolling.
+    const toc = useMemo(() => deriveToc(body), [body]);
     const isArchived = meta.status === 'archived';
-    const effectiveDate = formatDate(meta.effective_date);
-    const lastReviewed = formatDate(meta.last_reviewed);
+    const effectiveDate = useMemo(() => formatDate(meta.effective_date), [meta.effective_date]);
+    const lastReviewed = useMemo(() => formatDate(meta.last_reviewed), [meta.last_reviewed]);
     const [activeSectionId, setActiveSectionId] = useState<string>(
         toc[0]?.id ?? '',
     );
-    const contentBody = body.replace(/^#\s+.+\n+/u, '');
+    const contentBody = useMemo(() => body.replace(/^#\s+.+\n+/u, ''), [body]);
 
     useEffect(() => {
         const html = document.documentElement;

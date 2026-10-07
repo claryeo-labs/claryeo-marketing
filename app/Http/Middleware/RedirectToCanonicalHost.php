@@ -30,8 +30,10 @@ class RedirectToCanonicalHost
             return $next($request);
         }
 
-        $target = $request->getSchemeAndHttpHost().$request->getRequestUri();
-        $target = str_replace('://www.', '://', $target);
+        // Isolate host rewriting to the domain to avoid mangling or altering
+        // query string parameters or paths that contain "://www.".
+        $canonicalHost = substr($host, 4);
+        $target = $request->getScheme().'://'.$canonicalHost.$request->getRequestUri();
 
         // 301: permanent, so browsers and crawlers stop asking. Safe here —
         // the bare host is the canonical one in every environment.
