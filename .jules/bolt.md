@@ -26,3 +26,7 @@
 ## 2026-10-15 - Singleton Binding and Request-Level In-Memory Memoization for Global Mode Lookups
 **Learning:** `SiteMode::waitlist()` was evaluated repeatedly across middleware (`WaitlistTakeover`) and global view composers (`View::composer('*')`) for every template partial rendered during a web request. Registering `SiteMode` as a container singleton in `AppServiceProvider` and adding in-memory request-level memoization (`$this->cachedWaitlist ??= ...`) eliminates repeated `Cache::get()` and `Cache::has()` driver operations across multi-partial page renders.
 **Action:** Register global mode/flag services as singletons and memoize their resolved state in instance properties to bypass repeated cache queries across middleware and view composers.
+
+## 2026-10-15 - Deriving O(1) Static Lookup Maps for Global Middleware Route Allowlists
+**Learning:** Global middleware like `WaitlistTakeover` executed `$request->is(...self::ALLOWLIST)` on every single request, iterating through array patterns and executing regex matches. Dynamically deriving an $O(1)$ exact-match lookup map (`$exactAllowlist = array_fill_keys(array_filter(...), true)`) on initial load from the constant allows exact requests (e.g. `/`, `/quiz`, `/sitemap.xml`) to bypass pattern matching while maintaining `ALLOWLIST` as a single source of truth.
+**Action:** In global middleware path-matching routines, dynamically derive exact-match hash maps from string constants on first access to accelerate non-wildcard requests without duplicating configuration.
