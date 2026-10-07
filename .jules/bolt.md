@@ -18,3 +18,7 @@
 ## 2026-10-01 - Encapsulation of High-Frequency Timer State in Subcomponents
 **Learning:** High-frequency intervals (e.g. an 85ms typewriter cycle running ~11.7 Hz) placed at the root level of large container components like `LandingHero` trigger re-renders of the entire container tree and all child elements every tick. Encapsulating the animated state and interval inside a dedicated leaf subcomponent (`TypewriterWord`) isolates state updates and eliminates re-renders of parent JSX trees.
 **Action:** Isolate high-frequency interval or animation state into dedicated leaf subcomponents rather than declaring state at container scope.
+
+## 2026-10-02 - State Guarding in Scroll Handlers and Document Computation Memoization
+**Learning:** Calling `setState` directly on every native scroll event (e.g. `setScrolled(window.scrollY > 32)`) dispatches React state update checks on every single scroll frame (~60-120 Hz). Tracking local threshold state in closure variables prevents invoking `setState` except when crossing threshold boundaries. Furthermore, in scroll-driven components like `LegalDocumentPage`, active section changes trigger re-renders; memoizing document computations (`deriveToc`, string replacements, date formatting) prevents executing regexes over large text bodies on every scroll section update.
+**Action:** Guard `setState` calls in scroll event listeners with local threshold comparisons, and memoize string/regex parsing in components with scroll-driven state updates.
