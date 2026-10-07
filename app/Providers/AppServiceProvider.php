@@ -28,6 +28,10 @@ class AppServiceProvider extends ServiceProvider
                 (string) $config->get('services.main_api.token'),
             );
         });
+
+        // Performance optimization: Bind SiteMode as a singleton so that all middleware and
+        // view composer invocations within an HTTP request share a single in-memory instance.
+        $this->app->singleton(SiteMode::class);
     }
 
     /**

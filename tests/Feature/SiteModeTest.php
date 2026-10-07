@@ -53,6 +53,7 @@ class SiteModeTest extends TestCase
         config()->set('marketing.waitlist_mode', true);
         $this->assertTrue(app(SiteMode::class)->waitlist());
 
+        app(SiteMode::class)->flushCache();
         config()->set('marketing.waitlist_mode', false);
         $this->assertFalse(app(SiteMode::class)->waitlist());
     }
@@ -67,6 +68,7 @@ class SiteModeTest extends TestCase
         $this->assertTrue(app(SiteMode::class)->waitlist());
 
         Cache::forget('marketing:site');
+        app(SiteMode::class)->flushCache();
 
         $this->assertTrue(app(SiteMode::class)->waitlist());
         Http::assertSentCount(2);
