@@ -35,7 +35,7 @@ const AppearanceToggle: FC<AppearanceToggleProps> = ({ className = '' }) => {
             <Button
                 variant="ghost"
                 size="icon"
-                className="h-9 w-9 rounded-md"
+                className="h-9 w-9 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 aria-label={`Theme: ${current.label}. Switch to ${next.label}.`}
                 title={`Theme: ${current.label}`}
                 onClick={() => updateAppearance(next.value)}
