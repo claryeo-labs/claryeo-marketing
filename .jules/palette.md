@@ -22,6 +22,10 @@
 **Learning:** Requiring double-click (`onDoubleClick`) on buttons/triggers to activate inline editing renders the action inaccessible to keyboard and screen reader users because native button activation (Enter/Space keys) triggers `onClick`, not `onDoubleClick`.
 **Action:** Use single click (`onClick`) for editable text triggers or provide explicit edit icon buttons, and include `focus-visible:ring-2` along with informative `aria-label` instructions (`Click to edit`).
 
+## 2026-11-20 - WAI-ARIA Tablist Keyboard Navigation
+**Learning:** Interactive tab controls using `role="tablist"` and `role="tab"` elements require standard arrow key navigation (Left/Right/Up/Down, Home, End) and roving `tabIndex` management (`tabIndex={0}` on active tab, `-1` on inactive tabs). Without keydown event handlers to update selection and move DOM focus, keyboard users are forced to tab through every inactive tab individually.
+**Action:** Always attach `onKeyDown` handlers on `role="tab"` buttons that capture arrow keys/Home/End to cycle `active` tab state and explicitly call `focus()` on the newly selected tab element.
+
 ## 2026-10-16 - Header Navigation Link Focus Rings
 **Learning:** Custom header navigation links, brand logo triggers, and action links in site header bars missing explicit `focus-visible:ring-2` focus indicators prevent keyboard users from tracking keyboard navigation when tabbing through site header links.
 **Action:** Always include `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2` on all interactive header navigation links and brand logo elements.
