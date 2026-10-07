@@ -96,32 +96,13 @@ class WaitlistProxyTest extends TestCase
         Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), '/waitlist'));
     }
 
-    public function test_store_validates_input_locally_before_calling_internal_api(): void
-    {
-        Http::fake();
-
-        $this->postJson('/waitlist', [...$this->signup, 'email' => 'invalid-email'])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['email']);
-
-        $this->postJson('/waitlist', [...$this->signup, 'name' => str_repeat('A', 256)])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['name']);
-
-        $this->postJson('/waitlist', [...$this->signup, 'answers' => array_fill(0, 51, 'item')])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['answers']);
-
-        Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), '/waitlist'));
-    }
-
     public function test_store_relays_validation_errors_unchanged(): void
     {
-        Http::fake(['web.test/api/internal/waitlist' => Http::response(['detail' => 'An error occurred.'], 422)]);
+        Http::fake(['web.test/api/internal/waitlist' => Http::response(['detail' => 'Please provide a valid email address.'], 422)]);
 
-        $this->postJson('/waitlist', $this->signup)
+        $this->postJson('/waitlist', [...$this->signup, 'email' => 'nope'])
             ->assertStatus(422)
-            ->assertExactJson(['detail' => 'An error occurred.']);
+            ->assertExactJson(['detail' => 'Please provide a valid email address.']);
     }
 
     public function test_store_relays_the_already_joined_outcome_as_200(): void
