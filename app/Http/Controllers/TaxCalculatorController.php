@@ -7,6 +7,7 @@ use App\Services\MainApi;
 use App\Support\Faqs;
 use App\Support\SalaryPages;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -80,8 +81,13 @@ class TaxCalculatorController extends Controller
             'client_user_agent' => Str::limit((string) $request->userAgent(), 512, ''),
         ];
 
-        $response = $this->api->submitTaxReport($payload);
+        try {
+            $response = $this->api->submitTaxReport($payload);
 
-        return response()->json($response->json() ?? [], $response->status());
+            return response()->json($response->json() ?? [], $response->status());
+        } catch (ConnectionException) {
+            // Fail securely when internal API is unreachable to prevent 500 error / info leakage
+            return response()->json(['detail' => 'We couldn’t reach Claryeo. Please try again in a moment.'], 503);
+        }
     }
 }

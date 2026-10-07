@@ -135,16 +135,16 @@ const Contact: FC<ContactProps> = ({
                         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
                             <a
                                 href="mailto:hello@claryeo.com"
-                                className="group inline-flex items-center gap-1.5 text-lg font-medium text-foreground underline-offset-4 hover:underline"
+                                className="group inline-flex items-center gap-1.5 rounded-sm text-lg font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             >
                                 hello@claryeo.com
-                                <ArrowUpRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                                <ArrowUpRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
                             </a>
                             <a
                                 href={`tel:${PHONE.replace(/\s/g, '')}`}
-                                className="inline-flex items-center gap-2 text-lg font-medium text-foreground underline-offset-4 hover:underline"
+                                className="inline-flex items-center gap-2 rounded-sm text-lg font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             >
-                                <Phone className="size-4 text-muted-foreground" />
+                                <Phone className="size-4 text-muted-foreground" aria-hidden="true" />
                                 {PHONE}
                             </a>
                             <span className="text-sm text-muted-foreground">
@@ -176,12 +176,13 @@ const Contact: FC<ContactProps> = ({
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     aria-label={`Claryeo on ${social.label}`}
-                                    className="rounded-full border border-border/70 bg-card p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                                    className="rounded-full border border-border/70 bg-card p-2.5 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 >
                                     <svg
                                         className="size-4"
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
+                                        aria-hidden="true"
                                     >
                                         <path
                                             fill="currentColor"
@@ -307,11 +308,16 @@ const Contact: FC<ContactProps> = ({
                                     maxLength={MESSAGE_MAX}
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
+                                    aria-describedby="message-counter"
                                     className="min-h-36 resize-none rounded-xl border-border bg-background"
                                 />
                                 <div className="flex items-start justify-between gap-3">
                                     <InputError message={errors.message?.[0]} />
-                                    <span className="t-mono ml-auto shrink-0 text-xs text-muted-foreground">
+                                    <span
+                                        id="message-counter"
+                                        aria-live="polite"
+                                        className="t-mono ml-auto shrink-0 text-xs text-muted-foreground"
+                                    >
                                         {message.length}/{MESSAGE_MAX}
                                     </span>
                                 </div>
@@ -323,11 +329,14 @@ const Contact: FC<ContactProps> = ({
                                 className="bg-gradient-primary mt-1 h-11 w-full rounded-xl text-sm font-medium text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
                             >
                                 {processing ? (
-                                    <Spinner />
+                                    <>
+                                        <Spinner />
+                                        <span>Sending message…</span>
+                                    </>
                                 ) : (
                                     <>
                                         Send message
-                                        <Send className="size-4" />
+                                        <Send className="size-4" aria-hidden="true" />
                                     </>
                                 )}
                             </Button>
@@ -335,14 +344,14 @@ const Contact: FC<ContactProps> = ({
                                 By contacting us, you agree to our{' '}
                                 <a
                                     href="/terms"
-                                    className="font-semibold text-foreground underline underline-offset-2 hover:text-primary"
+                                    className="rounded-xs font-semibold text-foreground underline underline-offset-2 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 >
                                     Terms of service
                                 </a>{' '}
                                 and{' '}
                                 <a
                                     href="/privacy"
-                                    className="font-semibold text-foreground underline underline-offset-2 hover:text-primary"
+                                    className="rounded-xs font-semibold text-foreground underline underline-offset-2 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                 >
                                     Privacy policy
                                 </a>
