@@ -1202,6 +1202,7 @@ const TaxCalculatorPage: FC = () => {
                                                         <Input
                                                             value={item.label}
                                                             placeholder="Line label"
+                                                            aria-label="Earning line label"
                                                             className={cn(
                                                                 inputClassName,
                                                                 'min-w-0 flex-1',
@@ -1267,6 +1268,7 @@ const TaxCalculatorPage: FC = () => {
                                                         <CurrencyInput
                                                             value={item.amount}
                                                             placeholder="0.00"
+                                                            aria-label={`Amount for ${item.label || 'earning line item'}`}
                                                             className={
                                                                 inputClassName
                                                             }
@@ -1300,6 +1302,7 @@ const TaxCalculatorPage: FC = () => {
                                                             value={
                                                                 item.frequency
                                                             }
+                                                            aria-label={`Frequency for ${item.label || 'earning line item'}`}
                                                             className={
                                                                 selectClassName
                                                             }
@@ -1677,6 +1680,7 @@ const TaxCalculatorPage: FC = () => {
                                                         <Input
                                                             value={item.label}
                                                             placeholder="Line label"
+                                                            aria-label="Deduction line label"
                                                             className={cn(
                                                                 inputClassName,
                                                                 'min-w-0 flex-1',
@@ -1742,6 +1746,7 @@ const TaxCalculatorPage: FC = () => {
                                                         <CurrencyInput
                                                             value={item.amount}
                                                             placeholder="0.00"
+                                                            aria-label={`Amount for ${item.label || 'deduction line item'}`}
                                                             className={
                                                                 inputClassName
                                                             }
@@ -1775,6 +1780,7 @@ const TaxCalculatorPage: FC = () => {
                                                             value={
                                                                 item.frequency
                                                             }
+                                                            aria-label={`Frequency for ${item.label || 'deduction line item'}`}
                                                             className={
                                                                 selectClassName
                                                             }
