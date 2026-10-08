@@ -50,4 +50,10 @@ class FeaturePageTest extends TestCase
     {
         $this->get('/features/invoicing.highlights')->assertNotFound();
     }
+
+    public function test_invalid_feature_slug_format_and_length_are_blocked(): void
+    {
+        $this->get('/features/'.str_repeat('a', 65))->assertNotFound();
+        $this->get('/features/invoicing!@#$')->assertNotFound();
+    }
 }
