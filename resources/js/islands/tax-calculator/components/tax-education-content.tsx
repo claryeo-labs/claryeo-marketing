@@ -50,13 +50,13 @@ const TaxEducationContent: FC = memo(() => (
                 <table className="w-full border-collapse text-sm">
                     <thead>
                         <tr className="border-b border-border">
-                            <th className="px-4 py-3 text-left font-semibold">
+                            <th scope="col" className="px-4 py-3 text-left font-semibold">
                                 Band
                             </th>
-                            <th className="px-4 py-3 text-left font-semibold">
+                            <th scope="col" className="px-4 py-3 text-left font-semibold">
                                 Taxable Income (₦)
                             </th>
-                            <th className="px-4 py-3 text-left font-semibold">
+                            <th scope="col" className="px-4 py-3 text-left font-semibold">
                                 Rate
                             </th>
                         </tr>
@@ -114,13 +114,13 @@ const TaxEducationContent: FC = memo(() => (
                 <table className="w-full border-collapse text-sm">
                     <thead>
                         <tr className="border-b border-border">
-                            <th className="px-4 py-3 text-left font-semibold">
+                            <th scope="col" className="px-4 py-3 text-left font-semibold">
                                 Company Size
                             </th>
-                            <th className="px-4 py-3 text-left font-semibold">
+                            <th scope="col" className="px-4 py-3 text-left font-semibold">
                                 Annual Turnover
                             </th>
-                            <th className="px-4 py-3 text-left font-semibold">
+                            <th scope="col" className="px-4 py-3 text-left font-semibold">
                                 CIT Rate
                             </th>
                         </tr>
@@ -217,14 +217,14 @@ const TaxEducationContent: FC = memo(() => (
                 Want to learn more?{' '}
                 <a
                     href="/guides/paye-tax-nigeria"
-                    className="font-medium text-primary hover:underline"
+                    className="rounded-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                     Read our complete PAYE tax guide
                 </a>{' '}
                 or{' '}
                 <a
                     href="/guides/freelancer-tax-nigeria"
-                    className="font-medium text-primary hover:underline"
+                    className="rounded-xs font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                     see how freelancers handle tax in Nigeria
                 </a>
