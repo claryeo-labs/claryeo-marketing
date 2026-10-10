@@ -1,4 +1,5 @@
 import { ArrowUpRight, Bell, Mail, MessageCircle } from 'lucide-react';
+import { memo } from 'react';
 import type { FC, ReactNode } from 'react';
 
 import DashboardIncomeExpenseChart from '@/components/dashboard/dashboard-income-expense-chart';
@@ -106,44 +107,53 @@ function NotificationsPanel() {
     );
 }
 
-const ProductBento: FC = () => (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-        <BentoCard
-            eyebrow="Invoices & documents"
-            title="Send it, track it, get paid for it"
-            description="This is the actual invoice card from your dashboard: same numbers, same layout, once you're in."
-            href="/features/invoicing"
-        >
-            <InvoiceOverviewCard invoiceCount={23} paidCount={18} pendingCount={4} overdueCount={1} outstanding={0} />
-        </BentoCard>
+/**
+ * Performance optimization: Wrap static ProductBento grid with React.memo()
+ * to prevent unnecessary re-renders of heavy sub-trees (including DashboardIncomeExpenseChart
+ * and InvoiceOverviewCard) during landing page parent re-renders.
+ */
+const ProductBento: FC = memo(function ProductBento() {
+    return (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
+            <BentoCard
+                eyebrow="Invoices & documents"
+                title="Send it, track it, get paid for it"
+                description="This is the actual invoice card from your dashboard: same numbers, same layout, once you're in."
+                href="/features/invoicing"
+            >
+                <InvoiceOverviewCard invoiceCount={23} paidCount={18} pendingCount={4} overdueCount={1} outstanding={0} />
+            </BentoCard>
 
-        <BentoCard
-            eyebrow="Bank sync"
-            title="Every account, one balance"
-            description="Transactions land the moment they clear your bank, plotted on the same chart you'll see after signup."
-            className="md:col-span-2"
-        >
-            <DashboardIncomeExpenseChart config={{ data: INCOME_EXPENSE_DATA }} />
-        </BentoCard>
+            <BentoCard
+                eyebrow="Bank sync"
+                title="Every account, one balance"
+                description="Transactions land the moment they clear your bank, plotted on the same chart you'll see after signup."
+                className="md:col-span-2"
+            >
+                <DashboardIncomeExpenseChart config={{ data: INCOME_EXPENSE_DATA }} />
+            </BentoCard>
 
-        <BentoCard
-            eyebrow="Tax"
-            title="Know what you owe"
-            description="PIT, VAT and CIT estimates that update as your books do."
-            href="/tax-calculator"
-        >
-            <TaxPanel />
-        </BentoCard>
+            <BentoCard
+                eyebrow="Tax"
+                title="Know what you owe"
+                description="PIT, VAT and CIT estimates that update as your books do."
+                href="/tax-calculator"
+            >
+                <TaxPanel />
+            </BentoCard>
 
-        <BentoCard
-            eyebrow="Notifications"
-            title="Updates where you already look"
-            description="In-app, email or WhatsApp: you pick where invoice and payment news lands."
-            className="md:col-span-2"
-        >
-            <NotificationsPanel />
-        </BentoCard>
-    </div>
-);
+            <BentoCard
+                eyebrow="Notifications"
+                title="Updates where you already look"
+                description="In-app, email or WhatsApp: you pick where invoice and payment news lands."
+                className="md:col-span-2"
+            >
+                <NotificationsPanel />
+            </BentoCard>
+        </div>
+    );
+});
+
+ProductBento.displayName = 'ProductBento';
 
 export default ProductBento;
