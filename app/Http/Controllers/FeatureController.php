@@ -73,6 +73,11 @@ class FeatureController extends Controller
      */
     public function show(SiteMode $siteMode, string $slug): View
     {
+        // Defense in depth: validate $slug character set and length before checking config
+        if (strlen($slug) > 64 || preg_match('/^[a-zA-Z0-9\-_]+$/', $slug) !== 1) {
+            abort(Response::HTTP_NOT_FOUND);
+        }
+
         /** @var array<string, array<string, mixed>> $featurePages */
         $featurePages = Config::array('feature_pages', []);
 
