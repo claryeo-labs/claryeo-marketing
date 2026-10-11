@@ -1,5 +1,6 @@
 import { ArrowUpRight, Bell, Mail, MessageCircle } from 'lucide-react';
 import type { FC, ReactNode } from 'react';
+import { memo } from 'react';
 
 import DashboardIncomeExpenseChart from '@/components/dashboard/dashboard-income-expense-chart';
 import InvoiceOverviewCard from '@/components/dashboard/invoice-overview-card';
@@ -106,7 +107,11 @@ function NotificationsPanel() {
     );
 }
 
-const ProductBento: FC = () => (
+/**
+ * Performance optimization: Wrapped with React.memo() to prevent unnecessary
+ * re-renders of the entire bento grid and child charts/cards during parent updates.
+ */
+const ProductBento: FC = memo(() => (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
         <BentoCard
             eyebrow="Invoices & documents"
@@ -144,6 +149,8 @@ const ProductBento: FC = () => (
             <NotificationsPanel />
         </BentoCard>
     </div>
-);
+));
+
+ProductBento.displayName = 'ProductBento';
 
 export default ProductBento;

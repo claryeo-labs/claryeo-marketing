@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import type { FC, ReactNode } from 'react';
+import { memo } from 'react';
 
 import AtmosphereCanvas from '@/components/landing/atmosphere-canvas';
 import { cn } from '@/lib/utils';
@@ -25,10 +26,10 @@ type SiteCtaProps = {
  * button block on blog posts); this is the landing page's atmosphere bookend,
  * generalized so all of them share it.
  *
- * Also mounted as the `site-cta` island by resources/views/partials/cta.antlers.html
- * for the server-rendered pages, hence plain-data props.
+ * Performance optimization: Wrapped with React.memo() to prevent unnecessary
+ * re-renders of the inner canvas animation setup when parent containers update.
  */
-const SiteCta: FC<SiteCtaProps> = ({
+const SiteCta: FC<SiteCtaProps> = memo(({
     heading,
     eyebrow = 'Ready when you are',
     body,
@@ -77,6 +78,8 @@ const SiteCta: FC<SiteCtaProps> = ({
             </div>
         </div>
     </section>
-);
+));
+
+SiteCta.displayName = 'SiteCta';
 
 export default SiteCta;

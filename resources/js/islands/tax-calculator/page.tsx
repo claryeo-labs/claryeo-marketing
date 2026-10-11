@@ -145,35 +145,51 @@ function formatSignedNaira(value: number): string {
     return formatCurrency(value, 'NGN');
 }
 
-// Performance optimization: Pre-instantiate static Intl.DateTimeFormat to avoid
-// object creation overhead during tax calculator page renders.
+// Performance optimization: Pre-instantiate static Intl.DateTimeFormat and cache
+// formatted rule date strings in a static Map to eliminate repeated regex matching,
+// Date object instantiation, and Intl.DateTimeFormat calls on every input keystroke.
 const enNgDateFormatter = new Intl.DateTimeFormat('en-NG', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
 });
 
+const ruleDateCache = new Map<string, string>();
+
 function formatRuleDate(value: string): string {
+    const cached = ruleDateCache.get(value);
+    if (cached !== undefined) {
+        return cached;
+    }
+
+    let formatted: string;
     const dateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
     if (dateMatch) {
         const [, year, month, day] = dateMatch;
-        const parsedDate = new Date(
-            Number.parseInt(year, 10),
-            Number.parseInt(month, 10) - 1,
-            Number.parseInt(day, 10),
-        );
-
-        return enNgDateFormatter.format(parsedDate);
+        const monthIndex = Number.parseInt(month, 10) - 1;
+        if (monthIndex >= 0 && monthIndex < 12) {
+            const parsedDate = new Date(
+                Number.parseInt(year, 10),
+                monthIndex,
+                Number.parseInt(day, 10),
+            );
+            formatted = enNgDateFormatter.format(parsedDate);
+            ruleDateCache.set(value, formatted);
+            return formatted;
+        }
     }
 
     const parsedDate = new Date(value);
 
     if (Number.isNaN(parsedDate.getTime())) {
+        ruleDateCache.set(value, value);
         return value;
     }
 
-    return enNgDateFormatter.format(parsedDate);
+    formatted = enNgDateFormatter.format(parsedDate);
+    ruleDateCache.set(value, formatted);
+    return formatted;
 }
 
 function rowToneClasses(tone?: RowTone): string {
@@ -399,6 +415,16 @@ const TaxCalculatorPage: FC = () => {
     const activeProfile = useMemo(() => {
         return getTaxYearProfileByKey(taxYearKey);
     }, [taxYearKey]);
+
+    const formattedRuleSnapshotDate = useMemo(
+        () => formatRuleDate(activeProfile.ruleSnapshotDate),
+        [activeProfile.ruleSnapshotDate],
+    );
+
+    const formattedEffectiveFrom = useMemo(
+        () => formatRuleDate(activeProfile.effectiveFrom),
+        [activeProfile.effectiveFrom],
+    );
 
     const visibleDesktopPeriods = useMemo(() => {
         return SUMMARY_PERIODS.filter(
@@ -2460,15 +2486,11 @@ const TaxCalculatorPage: FC = () => {
                                 <p className="text-sm text-muted-foreground">
                                     Rule snapshot date:{' '}
                                     <span className="font-medium text-foreground">
-                                        {formatRuleDate(
-                                            activeProfile.ruleSnapshotDate,
-                                        )}
+                                        {formattedRuleSnapshotDate}
                                     </span>{' '}
                                     (effective{' '}
                                     <span className="font-medium text-foreground">
-                                        {formatRuleDate(
-                                            activeProfile.effectiveFrom,
-                                        )}
+                                        {formattedEffectiveFrom}
                                     </span>
                                     ). This calculator provides estimates only
                                     and does not replace professional tax

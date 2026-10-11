@@ -30,3 +30,7 @@
 ## 2026-10-15 - Deriving O(1) Static Lookup Maps for Global Middleware Route Allowlists
 **Learning:** Global middleware like `WaitlistTakeover` executed `$request->is(...self::ALLOWLIST)` on every single request, iterating through array patterns and executing regex matches. Dynamically deriving an $O(1)$ exact-match lookup map (`$exactAllowlist = array_fill_keys(array_filter(...), true)`) on initial load from the constant allows exact requests (e.g. `/`, `/quiz`, `/sitemap.xml`) to bypass pattern matching while maintaining `ALLOWLIST` as a single source of truth.
 **Action:** In global middleware path-matching routines, dynamically derive exact-match hash maps from string constants on first access to accelerate non-wildcard requests without duplicating configuration.
+
+## 2026-10-18 - Static Map Date Caching & Profile Date Memoization in Interactive Islands
+**Learning:** Calling `formatRuleDate` inside real-time interactive components (like `TaxCalculatorPage`) on every single input event executed regex matching, `Date` object construction, and `Intl.DateTimeFormat` calls even when profile date strings never changed. Statically caching formatted rule dates in an in-memory `Map` and wrapping active profile dates in `useMemo` eliminates redundant parsing and garbage collection churn during interactive typing.
+**Action:** Statically cache formatted date strings in an in-memory Map and memoize component-level date derivations in interactive islands driven by high-frequency input events.
