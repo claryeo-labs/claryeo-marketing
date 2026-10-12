@@ -30,3 +30,7 @@
 ## 2026-10-15 - Deriving O(1) Static Lookup Maps for Global Middleware Route Allowlists
 **Learning:** Global middleware like `WaitlistTakeover` executed `$request->is(...self::ALLOWLIST)` on every single request, iterating through array patterns and executing regex matches. Dynamically deriving an $O(1)$ exact-match lookup map (`$exactAllowlist = array_fill_keys(array_filter(...), true)`) on initial load from the constant allows exact requests (e.g. `/`, `/quiz`, `/sitemap.xml`) to bypass pattern matching while maintaining `ALLOWLIST` as a single source of truth.
 **Action:** In global middleware path-matching routines, dynamically derive exact-match hash maps from string constants on first access to accelerate non-wildcard requests without duplicating configuration.
+
+## 2026-11-01 - Request-Level Closure Memoization for Wildcard View Composers
+**Learning:** `View::composer('*')` triggers every time any template view or partial renders during a request. Re-evaluating `$request->query()`, regex validation (`preg_match`), and `$request->url()` formatting inside the wildcard composer runs repeatedly across dozens of rendered partials. Caching the computed canonical URL in `static` variables checked against `$cachedRequest !== $request` computes the URL once per HTTP request and reuses it across all partials.
+**Action:** In global or wildcard view composers, memoize request-derived variables using static variables checked against the active `$request` instance to eliminate redundant string formatting and regex work on multi-partial renders.
