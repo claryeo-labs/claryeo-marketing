@@ -99,6 +99,15 @@ class WaitlistController extends Controller
             return response()->json(['detail' => self::HONEYPOT], 422);
         }
 
+        // Validate request parameters locally (defense in depth) to prevent
+        // oversized payloads, nested array injection, or DoS before proxying to internal API.
+        $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'string', 'max:255'],
+            'company' => ['nullable', 'string', 'max:255'],
+            'answers' => ['nullable', 'array', 'max:20'],
+        ]);
+
         $payload = [
             ...$request->only(['name', 'email', 'company', 'answers', 'consent']),
             ...CaptureUtmParameters::resolve($request),
