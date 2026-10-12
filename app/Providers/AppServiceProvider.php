@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\View\Composers\BlogIndexComposer;
 use App\Services\MainApi;
 use App\Support\SiteMode;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -92,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', static function ($view): void {
             /** @var string|null $cachedPageUrl */
             static $cachedPageUrl = null;
-            /** @var \Illuminate\Http\Request|null $cachedRequest */
+            /** @var Request|null $cachedRequest */
             static $cachedRequest = null;
 
             $request = request();
