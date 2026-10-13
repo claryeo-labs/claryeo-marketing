@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
 import type { FC, ReactNode } from 'react';
+import { memo } from 'react';
 
 import AtmosphereCanvas from '@/components/landing/atmosphere-canvas';
 import { cn } from '@/lib/utils';
@@ -20,15 +21,12 @@ type SiteCtaProps = {
 };
 
 /**
- * The site's only closing CTA. Every page used to end on its own invention
- * (a primary-surface band on feature pages, a muted card on guides, a plain
- * button block on blog posts); this is the landing page's atmosphere bookend,
- * generalized so all of them share it.
- *
- * Also mounted as the `site-cta` island by resources/views/partials/cta.antlers.html
- * for the server-rendered pages, hence plain-data props.
+ * Performance optimization: Wrap static closing CTA with React.memo() to prevent
+ * unnecessary re-renders of the CTA section and its child AtmosphereCanvas element.
+ * Bypasses redundant canvas draw loops and IntersectionObserver re-bindings when
+ * consumed inside interactive parent pages.
  */
-const SiteCta: FC<SiteCtaProps> = ({
+const SiteCta: FC<SiteCtaProps> = memo(({
     heading,
     eyebrow = 'Ready when you are',
     body,
@@ -77,6 +75,8 @@ const SiteCta: FC<SiteCtaProps> = ({
             </div>
         </div>
     </section>
-);
+));
+
+SiteCta.displayName = 'SiteCta';
 
 export default SiteCta;
