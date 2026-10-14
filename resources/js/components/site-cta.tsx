@@ -61,7 +61,7 @@ const SiteCta: FC<SiteCtaProps> = ({
             <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
                 <a
                     href={primary.href}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink shadow-lg transition-transform hover:scale-[1.02]"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink shadow-lg transition-transform hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                 >
                     {primary.label}
                     <ArrowUpRight className="size-4" />
@@ -69,7 +69,7 @@ const SiteCta: FC<SiteCtaProps> = ({
                 {secondary && (
                     <a
                         href={secondary.href}
-                        className="rounded-full border border-paper/20 px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-paper/10"
+                        className="rounded-full border border-paper/20 px-6 py-3 text-sm font-medium text-paper transition-colors hover:bg-paper/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-paper focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
                     >
                         {secondary.label}
                     </a>
