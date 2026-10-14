@@ -105,7 +105,10 @@ class CaptureUtmParameters
                 continue;
             }
 
-            $clean = Str::limit(trim(Str::lower($value)), 255, '');
+            // Security: Strip ASCII control characters (\x00-\x1F and \x7F) to prevent control character injection,
+            // CRLF splitting, and log pollution when attribution parameters are stored or forwarded.
+            $sanitized = preg_replace('/[\x00-\x1F\x7F]/', '', $value);
+            $clean = Str::limit(trim(Str::lower((string) $sanitized)), 255, '');
 
             if ($clean !== '') {
                 $normalized[$key] = $clean;
