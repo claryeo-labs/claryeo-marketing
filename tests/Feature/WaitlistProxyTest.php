@@ -105,6 +105,23 @@ class WaitlistProxyTest extends TestCase
             ->assertExactJson(['detail' => 'Please provide a valid email address.']);
     }
 
+    public function test_store_validates_input_bounds_locally(): void
+    {
+        Http::fake();
+
+        $oversizedName = str_repeat('A', 256);
+        $this->postJson('/waitlist', [...$this->signup, 'name' => $oversizedName])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['name']);
+
+        $excessiveAnswers = array_fill(0, 51, 'item');
+        $this->postJson('/waitlist', [...$this->signup, 'answers' => $excessiveAnswers])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['answers']);
+
+        Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), '/waitlist'));
+    }
+
     public function test_store_relays_the_already_joined_outcome_as_200(): void
     {
         Http::fake(['web.test/api/internal/waitlist' => Http::response(['status' => 'already-joined', 'name' => 'Ada'])]);

@@ -30,7 +30,7 @@ class LegalController extends Controller
 
         if ($version !== null) {
             // Defense in depth against path traversal or malicious input forwarding to internal API
-            abort_unless(preg_match('/^[a-zA-Z0-9\.\-]+$/', $version) === 1, Response::HTTP_NOT_FOUND);
+            abort_unless(strlen($version) <= 64 && preg_match('/^[a-zA-Z0-9\.\-]+$/', $version) === 1, Response::HTTP_NOT_FOUND);
         }
 
         $document = $version !== null

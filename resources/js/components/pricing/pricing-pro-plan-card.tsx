@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import type { PlanCatalogItem } from '@/types/plan-catalog';
 
@@ -25,7 +26,11 @@ type PricingProPlanCardProps = {
     className?: string;
 };
 
-const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
+/**
+ * Performance optimization: Wrap PricingProPlanCard with React.memo() to skip
+ * re-rendering plan cards during parent container updates when their props remain stable.
+ */
+const PricingProPlanCard = memo(({
     plan,
     billing,
     headlinePrice,
@@ -36,7 +41,7 @@ const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
     ctaLabel,
     ctaDisabled = false,
     className = '',
-}) => {
+}: PricingProPlanCardProps) => {
     const features =
         marketingFeatures ??
         (tier === 'growth'
@@ -90,7 +95,7 @@ const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
                 ) : (
                     <a
                         href={ctaHref}
-                        className={`mt-auto flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-colors ${
+                        className={`mt-auto flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                             isPopular
                                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                                 : 'bg-muted text-foreground hover:bg-muted/80 dark:bg-muted/70 dark:hover:bg-muted'
@@ -127,6 +132,8 @@ const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
             </div>
         </div>
     );
-};
+});
+
+PricingProPlanCard.displayName = 'PricingProPlanCard';
 
 export default PricingProPlanCard;
