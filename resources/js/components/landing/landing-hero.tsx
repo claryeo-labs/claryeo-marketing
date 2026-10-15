@@ -168,7 +168,7 @@ const LandingHero: FC<LandingHeroProps> = ({ getStartedUrl, waitlistUrl, waitlis
                         onChange={(e) => handleIncomeChange(e.target.value)}
                         placeholder="What did you earn this year?"
                         aria-label="Estimated yearly income"
-                        className="min-w-0 flex-1 bg-transparent text-sm tabular-nums text-paper placeholder:text-mist/70 focus:outline-none"
+                        className="min-w-0 flex-1 rounded-xs bg-transparent text-sm tabular-nums text-paper placeholder:text-mist/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-paper/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ink"
                     />
                     <button
                         type="submit"
