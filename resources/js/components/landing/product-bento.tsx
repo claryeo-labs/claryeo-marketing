@@ -97,8 +97,11 @@ function NotificationsPanel() {
                     key={label}
                     className="flex items-center gap-3 border-b border-ink-border py-3 last:border-b-0"
                 >
-                    <Icon className={`size-3.5 shrink-0 ${unread ? 'text-dawn' : 'text-mist'}`} />
-                    <span className="min-w-0 flex-1 truncate text-sm text-paper">{label}</span>
+                    <Icon aria-hidden="true" className={`size-3.5 shrink-0 ${unread ? 'text-dawn' : 'text-mist'}`} />
+                    <span className="min-w-0 flex-1 truncate text-sm text-paper">
+                        <span className="sr-only">{unread ? '(Unread) ' : ''}</span>
+                        {label}
+                    </span>
                     <span className="shrink-0 t-mono text-[10px] text-mist">{time}</span>
                 </div>
             ))}
