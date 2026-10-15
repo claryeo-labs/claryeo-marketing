@@ -35,7 +35,7 @@ const PricingFreePlanCard: FC<PricingFreePlanCardProps> = ({
             </p>
             <a
                 href={ctaHref}
-                className="mt-auto flex w-full items-center justify-center rounded-xl bg-muted px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/80 dark:bg-muted/70 dark:hover:bg-muted"
+                className="mt-auto flex w-full items-center justify-center rounded-xl bg-muted px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-muted/70 dark:hover:bg-muted"
             >
                 {ctaLabel}
             </a>

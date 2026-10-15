@@ -30,7 +30,7 @@ const PricingEnterpriseBanner: FC<PricingEnterpriseBannerProps> = ({
             </div>
             <a
                 href={ctaHref}
-                className="inline-flex shrink-0 items-center justify-center rounded-xl border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted dark:border-border"
+                className="inline-flex shrink-0 items-center justify-center rounded-xl border border-border bg-background px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:border-border"
             >
                 {plan.requiresContactSales
                     ? 'Contact sales'
