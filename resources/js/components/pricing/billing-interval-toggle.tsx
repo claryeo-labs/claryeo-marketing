@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -11,12 +12,16 @@ type BillingIntervalToggleProps = {
     compact?: boolean;
 };
 
-const BillingIntervalToggle: FC<BillingIntervalToggleProps> = ({
+/**
+ * Performance optimization: Wrap BillingIntervalToggle with React.memo() to avoid
+ * unnecessary re-renders when parent component state updates without changing toggle props.
+ */
+const BillingIntervalToggle = memo(({
     value,
     onChange,
     savePercent,
     compact = false,
-}) => (
+}: BillingIntervalToggleProps) => (
     <div
         role="group"
         aria-label="Billing interval"
@@ -58,6 +63,8 @@ const BillingIntervalToggle: FC<BillingIntervalToggleProps> = ({
             </span>
         </button>
     </div>
-);
+));
+
+BillingIntervalToggle.displayName = 'BillingIntervalToggle';
 
 export default BillingIntervalToggle;

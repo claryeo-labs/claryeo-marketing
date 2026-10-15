@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import type { PlanCatalogItem } from '@/types/plan-catalog';
 
@@ -8,11 +9,15 @@ type PricingEnterpriseBannerProps = {
     className?: string;
 };
 
-const PricingEnterpriseBanner: FC<PricingEnterpriseBannerProps> = ({
+/**
+ * Performance optimization: Wrap PricingEnterpriseBanner with React.memo() to skip
+ * re-rendering this banner when parent state updates occur (e.g. toggling billing interval).
+ */
+const PricingEnterpriseBanner = memo(({
     plan,
     ctaHref,
     className = '',
-}) => (
+}: PricingEnterpriseBannerProps) => (
     <div
         className={`rounded-2xl border border-border bg-card p-6 shadow-sm dark:border-border dark:bg-card ${className}`}
     >
@@ -38,6 +43,8 @@ const PricingEnterpriseBanner: FC<PricingEnterpriseBannerProps> = ({
             </a>
         </div>
     </div>
-);
+));
+
+PricingEnterpriseBanner.displayName = 'PricingEnterpriseBanner';
 
 export default PricingEnterpriseBanner;

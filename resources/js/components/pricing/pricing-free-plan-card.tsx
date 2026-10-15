@@ -1,5 +1,6 @@
 import { Check, Minus } from 'lucide-react';
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import type { PlanCatalogItem } from '@/types/plan-catalog';
 
@@ -13,13 +14,19 @@ type PricingFreePlanCardProps = {
     className?: string;
 };
 
-const PricingFreePlanCard: FC<PricingFreePlanCardProps> = ({
+/**
+ * Performance optimization: Wrap PricingFreePlanCard with React.memo() to skip
+ * re-rendering this static card when parent state updates occur (e.g. toggling
+ * billing interval in PricingPlansShowcase or interacting with slider controls
+ * on pricing pages).
+ */
+const PricingFreePlanCard = memo(({
     plan,
     ctaHref,
     ctaLabel = 'Get Started',
     excludedFeatureLabel = 'No Open Banking Sync',
     className = '',
-}) => (
+}: PricingFreePlanCardProps) => (
     <div
         className={`flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm dark:border-border dark:bg-card ${className}`}
     >
@@ -67,6 +74,8 @@ const PricingFreePlanCard: FC<PricingFreePlanCardProps> = ({
             </ul>
         </div>
     </div>
-);
+));
+
+PricingFreePlanCard.displayName = 'PricingFreePlanCard';
 
 export default PricingFreePlanCard;

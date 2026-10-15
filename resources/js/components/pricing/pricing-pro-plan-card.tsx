@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react';
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import type { PlanCatalogItem } from '@/types/plan-catalog';
 
@@ -25,7 +26,11 @@ type PricingProPlanCardProps = {
     className?: string;
 };
 
-const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
+/**
+ * Performance optimization: Wrap PricingProPlanCard with React.memo() to skip
+ * re-rendering plan cards during parent container updates when their props remain stable.
+ */
+const PricingProPlanCard = memo(({
     plan,
     billing,
     headlinePrice,
@@ -36,7 +41,7 @@ const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
     ctaLabel,
     ctaDisabled = false,
     className = '',
-}) => {
+}: PricingProPlanCardProps) => {
     const features =
         marketingFeatures ??
         (tier === 'growth'
@@ -127,6 +132,8 @@ const PricingProPlanCard: FC<PricingProPlanCardProps> = ({
             </div>
         </div>
     );
-};
+});
+
+PricingProPlanCard.displayName = 'PricingProPlanCard';
 
 export default PricingProPlanCard;
