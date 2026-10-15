@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\View\Composers\BlogIndexComposer;
 use App\Services\MainApi;
 use App\Support\SiteMode;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -86,21 +87,35 @@ class AppServiceProvider extends ServiceProvider
         // route is dispatched under some runtimes (and only once per worker
         // under any persistent one), which would freeze every canonical to
         // whichever URL booted the app.
+        // Performance optimization: Memoize computed page_url bound to the current request instance
+        // so that rendering multiple template partials on a single request reuses the canonical URL
+        // string without repeating query checks, regex evaluation, or $request->url() creation.
         View::composer('*', static function ($view): void {
+            /** @var string|null $cachedPageUrl */
+            static $cachedPageUrl = null;
+            /** @var Request|null $cachedRequest */
+            static $cachedRequest = null;
+
             $request = request();
-            $page = $request->query('page');
 
-            // Paginated lists must self-canonicalise per page, or pages 2..n
-            // tell Google to drop them in favour of page 1.
-            // Sanitize and validate $page to prevent URL parameter injection
-            // and canonical tag / Open Graph metadata URL pollution.
-            $isValidPageNumber = is_scalar($page)
-                && preg_match('/^[1-9][0-9]{0,5}$/', (string) $page) === 1
-                && (int) $page > 1;
+            if ($cachedRequest !== $request) {
+                $cachedRequest = $request;
+                $page = $request->query('page');
 
-            $view->with('page_url', $isValidPageNumber
-                ? $request->url().'?page='.(string) $page
-                : $request->url());
+                // Paginated lists must self-canonicalise per page, or pages 2..n
+                // tell Google to drop them in favour of page 1.
+                // Sanitize and validate $page to prevent URL parameter injection
+                // and canonical tag / Open Graph metadata URL pollution.
+                $isValidPageNumber = is_scalar($page)
+                    && preg_match('/^[1-9][0-9]{0,5}$/', (string) $page) === 1
+                    && (int) $page > 1;
+
+                $cachedPageUrl = $isValidPageNumber
+                    ? $request->url().'?page='.(string) $page
+                    : $request->url();
+            }
+
+            $view->with('page_url', $cachedPageUrl);
         });
         View::share('site_root', url('/'));
         View::share('og_image', file_exists(public_path('og.png')) ? url('/og.png') : null);
