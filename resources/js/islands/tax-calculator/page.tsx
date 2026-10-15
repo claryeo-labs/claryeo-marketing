@@ -153,7 +153,19 @@ const enNgDateFormatter = new Intl.DateTimeFormat('en-NG', {
     year: 'numeric',
 });
 
+// Performance optimization: Cache formatted rule dates to avoid regex pattern matching,
+// Date object instantiation, and Intl.DateTimeFormat.prototype.format() execution
+// on every interactive state change / keystroke re-render.
+const ruleDateCache = new Map<string, string>();
+
 function formatRuleDate(value: string): string {
+    const cached = ruleDateCache.get(value);
+
+    if (cached !== undefined) {
+        return cached;
+    }
+
+    let result = value;
     const dateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
     if (dateMatch) {
@@ -164,16 +176,18 @@ function formatRuleDate(value: string): string {
             Number.parseInt(day, 10),
         );
 
-        return enNgDateFormatter.format(parsedDate);
+        result = enNgDateFormatter.format(parsedDate);
+    } else {
+        const parsedDate = new Date(value);
+
+        if (!Number.isNaN(parsedDate.getTime())) {
+            result = enNgDateFormatter.format(parsedDate);
+        }
     }
 
-    const parsedDate = new Date(value);
+    ruleDateCache.set(value, result);
 
-    if (Number.isNaN(parsedDate.getTime())) {
-        return value;
-    }
-
-    return enNgDateFormatter.format(parsedDate);
+    return result;
 }
 
 function rowToneClasses(tone?: RowTone): string {
