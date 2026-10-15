@@ -69,4 +69,20 @@ class CaptureUtmParametersTest extends TestCase
             'utm_source' => 'facebook',
         ], $resolved);
     }
+
+    public function test_strips_control_characters_from_utm_parameters(): void
+    {
+        $request = Request::create('/?utm_source=Google%0D%0AHeader&utm_medium=CP%00C', 'GET');
+        $request->setLaravelSession($this->app['session']->driver('array'));
+
+        $middleware = new CaptureUtmParameters;
+        $middleware->handle($request, fn (Request $req): Response => new Response);
+
+        $resolved = CaptureUtmParameters::resolve($request);
+
+        $this->assertEquals([
+            'utm_source' => 'googleheader',
+            'utm_medium' => 'cpc',
+        ], $resolved);
+    }
 }

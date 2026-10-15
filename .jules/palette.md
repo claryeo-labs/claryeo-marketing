@@ -33,3 +33,7 @@
 ## 2026-10-16 - Dynamic Multi-Line Form Field Accessibility
 **Learning:** Form inputs and select dropdowns inside dynamically added multi-line item cards (such as custom earnings/deductions lists) rendered without visible `<label htmlFor>` tags leave screen reader users without context when tabbing between fields.
 **Action:** Always provide contextual `aria-label={`[Field] for ${item.label || '[Default]'}`}` on dynamic list inputs and select dropdowns.
+
+## 2026-10-16 - Focus Ring Indicators on Custom Form Container Inputs
+**Learning:** Custom input elements placed inside styled container forms (such as dark atmosphere hero forms) using `focus:outline-none` without `focus-visible` ring indicators hide focus focus location from keyboard users.
+**Action:** Always include explicit `focus-visible:ring-2 focus-visible:ring-...` ring indicators on inputs embedded inside custom container forms.

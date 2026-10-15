@@ -99,6 +99,14 @@ class WaitlistController extends Controller
             return response()->json(['detail' => self::HONEYPOT], 422);
         }
 
+        // Validate payload boundaries locally to prevent oversized input / DoS forwarding
+        $request->validate([
+            'name' => ['nullable', 'string', 'max:255'],
+            'email' => ['nullable', 'string', 'max:255'],
+            'company' => ['nullable', 'string', 'max:255'],
+            'answers' => ['nullable', 'array', 'max:50'],
+        ]);
+
         $payload = [
             ...$request->only(['name', 'email', 'company', 'answers', 'consent']),
             ...CaptureUtmParameters::resolve($request),

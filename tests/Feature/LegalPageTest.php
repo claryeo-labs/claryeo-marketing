@@ -100,6 +100,7 @@ class LegalPageTest extends TestCase
 
         $this->get('/privacy/..%2F..%2Fadmin')->assertNotFound();
         $this->get('/privacy/invalid@version')->assertNotFound();
+        $this->get('/privacy/'.str_repeat('1', 65))->assertNotFound();
 
         // Only the site-mode lookup (App\Support\SiteMode) may go out.
         Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), '/legal/'));

@@ -153,7 +153,19 @@ const enNgDateFormatter = new Intl.DateTimeFormat('en-NG', {
     year: 'numeric',
 });
 
+// Performance optimization: Cache formatted rule dates to avoid regex pattern matching,
+// Date object instantiation, and Intl.DateTimeFormat.prototype.format() execution
+// on every interactive state change / keystroke re-render.
+const ruleDateCache = new Map<string, string>();
+
 function formatRuleDate(value: string): string {
+    const cached = ruleDateCache.get(value);
+
+    if (cached !== undefined) {
+        return cached;
+    }
+
+    let result = value;
     const dateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
     if (dateMatch) {
@@ -164,16 +176,18 @@ function formatRuleDate(value: string): string {
             Number.parseInt(day, 10),
         );
 
-        return enNgDateFormatter.format(parsedDate);
+        result = enNgDateFormatter.format(parsedDate);
+    } else {
+        const parsedDate = new Date(value);
+
+        if (!Number.isNaN(parsedDate.getTime())) {
+            result = enNgDateFormatter.format(parsedDate);
+        }
     }
 
-    const parsedDate = new Date(value);
+    ruleDateCache.set(value, result);
 
-    if (Number.isNaN(parsedDate.getTime())) {
-        return value;
-    }
-
-    return enNgDateFormatter.format(parsedDate);
+    return result;
 }
 
 function rowToneClasses(tone?: RowTone): string {
@@ -239,9 +253,6 @@ function removeLineItem(
 }
 
 const TaxCalculatorPage: FC = () => {
-    const csrf =
-        document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ??
-        '';
     const isWaitlistMode = false;
 
     const [reportEmail, setReportEmail] = useState('');
@@ -252,9 +263,14 @@ const TaxCalculatorPage: FC = () => {
     const [reportError, setReportError] = useState<string | null>(null);
     const [reportFormOpen, setReportFormOpen] = useState(false);
 
-    // The landing hero hands the year's earnings over as ?income=500000, so the
-    // estimate the visitor asked for is already on screen when the page opens.
-    const seededIncome = ((): string | null => {
+    // Performance optimization: Memoize seededIncome query parameter lookup so URL
+    // parsing and currency string formatting only run once on component mount rather
+    // than executing on every input keystroke and re-render.
+    const seededIncome = useMemo(() => {
+        if (typeof window === 'undefined') {
+            return null;
+        }
+
         const raw = new URLSearchParams(window.location.search).get('income');
 
         if (raw === null) {
@@ -266,7 +282,7 @@ const TaxCalculatorPage: FC = () => {
         return Number.isFinite(parsed) && parsed > 0
             ? formatCurrencyInputValue(String(parsed))
             : null;
-    })();
+    }, []);
 
     const [mode, setMode] = useState<CalculatorMode>('employee_paye');
     const [taxYearKey, setTaxYearKey] = useState(defaultTaxYearProfile.key);
@@ -288,15 +304,18 @@ const TaxCalculatorPage: FC = () => {
     const [employeeDeductionsEntryMode, setEmployeeDeductionsEntryMode] =
         useState<EntryMode>('single');
 
+    // Performance optimization: Use lazy state initializers (useState(() => ...)) so
+    // initial formatting functions like formatCurrencyInputValue and ID generators
+    // only execute during initial mount, bypassing redundant evaluations during re-renders.
     const [employeeSingleEarningAmount, setEmployeeSingleEarningAmount] =
-        useState(seededIncome ?? formatCurrencyInputValue('60000'));
+        useState(() => seededIncome ?? formatCurrencyInputValue('60000'));
     const [employeeSingleEarningFrequency, setEmployeeSingleEarningFrequency] =
-        useState<AmountFrequency>(seededIncome !== null ? 'annually' : 'monthly');
+        useState<AmountFrequency>(() => (seededIncome !== null ? 'annually' : 'monthly'));
     const [employeeSingleEarningTaxable, setEmployeeSingleEarningTaxable] =
         useState(true);
 
     const [employeeSingleDeductionAmount, setEmployeeSingleDeductionAmount] =
-        useState(formatCurrencyInputValue('0'));
+        useState(() => formatCurrencyInputValue('0'));
     const [
         employeeSingleDeductionFrequency,
         setEmployeeSingleDeductionFrequency,
@@ -304,7 +323,7 @@ const TaxCalculatorPage: FC = () => {
 
     const [employeeEarningItems, setEmployeeEarningItems] = useState<
         EditableLineItem[]
-    >([
+    >(() => [
         {
             id: createLineId(),
             label: 'Basic salary',
@@ -315,7 +334,7 @@ const TaxCalculatorPage: FC = () => {
         },
     ]);
 
-    const [employeeRentPaidAmount, setEmployeeRentPaidAmount] = useState(
+    const [employeeRentPaidAmount, setEmployeeRentPaidAmount] = useState(() =>
         formatCurrencyInputValue('0'),
     );
     const [employeeRentPaidFrequency, setEmployeeRentPaidFrequency] =
@@ -323,7 +342,7 @@ const TaxCalculatorPage: FC = () => {
 
     const [employeeDeductionItems, setEmployeeDeductionItems] = useState<
         EditableLineItem[]
-    >([
+    >(() => [
         {
             id: createLineId(),
             label: 'Pension',
@@ -340,12 +359,12 @@ const TaxCalculatorPage: FC = () => {
         useState<EntryMode>('single');
 
     const [businessSingleEarningAmount, setBusinessSingleEarningAmount] =
-        useState(seededIncome ?? formatCurrencyInputValue('60000'));
+        useState(() => seededIncome ?? formatCurrencyInputValue('60000'));
     const [businessSingleEarningFrequency, setBusinessSingleEarningFrequency] =
-        useState<AmountFrequency>(seededIncome !== null ? 'annually' : 'monthly');
+        useState<AmountFrequency>(() => (seededIncome !== null ? 'annually' : 'monthly'));
 
     const [businessSingleDeductionAmount, setBusinessSingleDeductionAmount] =
-        useState(formatCurrencyInputValue('0'));
+        useState(() => formatCurrencyInputValue('0'));
     const [
         businessSingleDeductionFrequency,
         setBusinessSingleDeductionFrequency,
@@ -353,7 +372,7 @@ const TaxCalculatorPage: FC = () => {
 
     const [businessEarningItems, setBusinessEarningItems] = useState<
         EditableLineItem[]
-    >([
+    >(() => [
         {
             id: createLineId(),
             label: 'Product sales',
@@ -366,7 +385,7 @@ const TaxCalculatorPage: FC = () => {
 
     const [businessDeductionItems, setBusinessDeductionItems] = useState<
         EditableLineItem[]
-    >([
+    >(() => [
         {
             id: createLineId(),
             label: 'Rent',
@@ -377,16 +396,18 @@ const TaxCalculatorPage: FC = () => {
         },
     ]);
 
-    const [vatCollected, setVatCollected] = useState(
+    const [vatCollected, setVatCollected] = useState(() =>
         formatCurrencyInputValue('0'),
     );
-    const [vatInput, setVatInput] = useState(formatCurrencyInputValue('0'));
-    const [businessFixedAssets, setBusinessFixedAssets] = useState(
+    const [vatInput, setVatInput] = useState(() =>
+        formatCurrencyInputValue('0'),
+    );
+    const [businessFixedAssets, setBusinessFixedAssets] = useState(() =>
         formatCurrencyInputValue('0'),
     );
     const [isProfessionalService, setIsProfessionalService] = useState(false);
     const [isNonResidentCompany, setIsNonResidentCompany] = useState(false);
-    const [businessAssessableProfit, setBusinessAssessableProfit] = useState(
+    const [businessAssessableProfit, setBusinessAssessableProfit] = useState(() =>
         formatCurrencyInputValue('0'),
     );
 
@@ -744,6 +765,11 @@ const TaxCalculatorPage: FC = () => {
         };
 
         try {
+            // Performance optimization: Query CSRF meta token on demand when dispatching report
+            // rather than performing document.querySelector DOM traversal on every component render.
+            const csrf =
+                document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ??
+                '';
             const headers: Record<string, string> = {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
