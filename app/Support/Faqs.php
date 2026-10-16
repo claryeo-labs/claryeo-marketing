@@ -23,6 +23,13 @@ class Faqs
     }
 
     /**
+     * Load and parse FAQ sets from disk.
+     *
+     * Performance optimization: Static in-memory caching in self::$cache ensures
+     * faqs.json is read from disk (file_get_contents) and JSON decoded only once per
+     * process lifetime, eliminating redundant file I/O and parsing on every Faqs::get()
+     * call across controllers and Antlers tags.
+     *
      * @return array<string, list<array{question: string, answer: string}>>
      */
     private static function load(): array
