@@ -37,3 +37,7 @@
 ## 2026-10-16 - Focus Ring Indicators on Custom Form Container Inputs
 **Learning:** Custom input elements placed inside styled container forms (such as dark atmosphere hero forms) using `focus:outline-none` without `focus-visible` ring indicators hide focus focus location from keyboard users.
 **Action:** Always include explicit `focus-visible:ring-2 focus-visible:ring-...` ring indicators on inputs embedded inside custom container forms.
+
+## 2026-10-16 - Radix ToggleGroup Container Accessibility Labels
+**Learning:** Radix `ToggleGroup` container controls (`role="group"` / `role="radiogroup"`) rendered without explicit `aria-label` or `aria-labelledby` attributes prevent screen reader users from hearing semantic group context when navigating option toggle choices.
+**Action:** Always provide descriptive `aria-label="..."` on `ToggleGroup` primitive components so screen readers announce group purpose alongside individual option states.
