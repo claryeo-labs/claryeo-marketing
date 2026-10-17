@@ -105,6 +105,7 @@ class WaitlistController extends Controller
             'email' => ['nullable', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],
             'answers' => ['nullable', 'array', 'max:50'],
+            'consent' => ['nullable', 'boolean'],
         ]);
 
         $payload = [
