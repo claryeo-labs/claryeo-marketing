@@ -307,7 +307,7 @@ const SiteNav: FC<SiteNavProps> = ({
                         {featureLead && (
                             <a
                                 href={featureLead.href}
-                                className="t-eyebrow group inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                                className="t-eyebrow group inline-flex items-center gap-1.5 rounded-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             >
                                 {featureLead.label}
                                 <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -319,7 +319,7 @@ const SiteNav: FC<SiteNavProps> = ({
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        'group flex items-start justify-between gap-4 border-border py-5',
+                                        'group flex items-start justify-between gap-4 rounded-md border-border py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                                         i >= 2 && 'border-t',
                                     )}
                                 >
@@ -361,7 +361,7 @@ const SiteNav: FC<SiteNavProps> = ({
                         {resourcesLead && (
                             <a
                                 href={resourcesLead.href}
-                                className="t-eyebrow group inline-flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-foreground"
+                                className="t-eyebrow group inline-flex items-center gap-1.5 rounded-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             >
                                 {resourcesLead.label}
                                 <ArrowUpRight className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -379,7 +379,7 @@ const SiteNav: FC<SiteNavProps> = ({
                                             <li key={link.label}>
                                                 <a
                                                     href={link.href}
-                                                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                                                    className="rounded-xs text-sm text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                                 >
                                                     {link.label}
                                                 </a>
@@ -400,7 +400,12 @@ const SiteNav: FC<SiteNavProps> = ({
                                         <a
                                             key={item.label}
                                             href={item.href}
-                                            className="flex min-w-52 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/40 hover:bg-accent"
+                                            aria-label={
+                                                item.desc
+                                                    ? `${item.label}: ${item.desc}`
+                                                    : item.label
+                                            }
+                                            className="flex min-w-52 items-center gap-3 rounded-xl border border-border bg-card px-4 py-3 transition-colors hover:border-primary/40 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                                         >
                                             <div className="flex size-9 items-center justify-center rounded-lg bg-primary-surface text-primary-surface-foreground">
                                                 <ArrowUpRight className="size-4" />
