@@ -42,6 +42,7 @@ const PricingFreePlanCard = memo(({
             </p>
             <a
                 href={ctaHref}
+                aria-label={`${ctaLabel} for ${plan.name} plan`}
                 className="mt-auto flex w-full items-center justify-center rounded-xl bg-muted px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:bg-muted/70 dark:hover:bg-muted"
             >
                 {ctaLabel}
@@ -59,14 +60,20 @@ const PricingFreePlanCard = memo(({
                         key={bullet}
                         className="flex items-start gap-3 text-sm text-muted-foreground"
                     >
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <span
+                            className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                            aria-hidden="true"
+                        >
                             <Check className="h-3 w-3" strokeWidth={3} />
                         </span>
                         <span>{bullet}</span>
                     </li>
                 ))}
                 <li className="flex items-start gap-3 text-sm text-muted-foreground/70">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    <span
+                        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground"
+                        aria-hidden="true"
+                    >
                         <Minus className="h-3 w-3" />
                     </span>
                     <span>{excludedFeatureLabel}</span>

@@ -95,6 +95,7 @@ const PricingProPlanCard = memo(({
                 ) : (
                     <a
                         href={ctaHref}
+                        aria-label={`${ctaLabel ?? defaultCtaLabel} for ${plan.name} plan (${billing === 'annual' ? 'billed annually' : 'billed monthly'})`}
                         className={`mt-auto flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                             isPopular
                                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
@@ -116,7 +117,10 @@ const PricingProPlanCard = memo(({
                 <ul className="mt-6 flex flex-col gap-4">
                     {features.map(({ title, description }) => (
                         <li key={title} className="flex gap-3 text-sm">
-                            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                            <span
+                                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground"
+                                aria-hidden="true"
+                            >
                                 <Check className="h-3 w-3" strokeWidth={3} />
                             </span>
                             <span className="text-muted-foreground">
