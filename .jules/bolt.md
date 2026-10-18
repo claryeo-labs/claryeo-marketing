@@ -38,3 +38,7 @@
 ## 2026-11-01 - Request-Level Closure Memoization for Wildcard View Composers
 **Learning:** `View::composer('*')` triggers every time any template view or partial renders during a request. Re-evaluating `$request->query()`, regex validation (`preg_match`), and `$request->url()` formatting inside the wildcard composer runs repeatedly across dozens of rendered partials. Caching the computed canonical URL in `static` variables checked against `$cachedRequest !== $request` computes the URL once per HTTP request and reuses it across all partials.
 **Action:** In global or wildcard view composers, memoize request-derived variables using static variables checked against the active `$request` instance to eliminate redundant string formatting and regex work on multi-partial renders.
+
+## 2026-11-15 - Single-Pass Native Loops for Global Provider Boot Transformations
+**Learning:** Building menu items or configuration models during `AppServiceProvider::boot()` via multi-stage Laravel Collection pipelines (`collect($config)->map()->filter()->map()->values()->all()`) allocates multiple `Collection` objects, intermediate array wrappers, and closure frames on every single HTTP request. Replacing these pipelines with single-pass `foreach` loops eliminates heap allocations and speeds up global application boot.
+**Action:** In framework lifecycle routines like service provider `boot()` methods that run on every HTTP request, use single-pass native `foreach` loops instead of multi-step `Collection` pipelines.

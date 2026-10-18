@@ -53,25 +53,29 @@ class AppServiceProvider extends ServiceProvider
         // Features mega-menu, built from the individual feature pages.
         /** @var array<string, array<string, mixed>> $featurePages */
         $featurePages = Config::array('feature_pages', []);
-        $str = static fn (mixed $v): string => is_string($v) ? $v : '';
-        $featureItems = collect($featurePages)
-            // Nullish reads on purpose: this runs in boot() for every request,
-            // so a feature entry missing a key degrades one menu row instead of
-            // 500-ing the whole site.
-            ->map(fn (array $f): array => [
-                'eyebrow' => $str($f['eyebrow'] ?? null),
-                'title' => $str($f['title'] ?? null),
-                'tagline' => $str($f['tagline'] ?? null),
-                'slug' => $str($f['slug'] ?? null),
+        $featureItems = [];
+
+        // Performance optimization: Parse feature pages in a single-pass foreach loop instead of
+        // instantiating Laravel Collection objects with multi-stage map/filter/values pipelines.
+        // Bypasses wrapper allocations and closure dispatch overhead on every HTTP request boot.
+        foreach ($featurePages as $f) {
+            $title = is_string($f['title'] ?? null) ? $f['title'] : '';
+            $slug = is_string($f['slug'] ?? null) ? $f['slug'] : '';
+
+            if ($title === '' || $slug === '') {
+                continue;
+            }
+
+            $featureItems[] = [
+                'eyebrow' => is_string($f['eyebrow'] ?? null) ? $f['eyebrow'] : '',
+                'title' => $title,
+                'tagline' => is_string($f['tagline'] ?? null) ? $f['tagline'] : '',
+                'slug' => $slug,
                 'badge' => $f['badge'] ?? null,
-            ])
-            ->filter(fn (array $f): bool => $f['title'] !== '' && $f['slug'] !== '')
-            ->map(fn (array $f): array => [
-                ...$f,
-                'href' => '/features/'.$f['slug'],
-            ])
-            ->values()
-            ->all();
+                'href' => '/features/'.$slug,
+            ];
+        }
+
         $features = [
             'lead' => ['label' => 'All features', 'href' => '/features'],
             'items' => $featureItems,
