@@ -90,6 +90,10 @@ const AI_CREDIT_ADD_ON_KEYS = AI_CREDIT_PRICE_TIERS.map(
     (tier) => `ai_credits_${tier.credits}`,
 );
 
+// Performance optimization: Static Set for O(1) constant-time lookup of AI credit add-on keys.
+// Bypasses linear array searches (.includes()) inside add-on filtering loops on every render.
+const AI_CREDIT_ADD_ON_KEYS_SET = new Set(AI_CREDIT_ADD_ON_KEYS);
+
 const TOOLTIP_DELAY_MS = 350;
 
 type TooltipController = {
@@ -486,10 +490,10 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
     );
 
     const hasAiCreditAddOns = addOns.some((row) =>
-        AI_CREDIT_ADD_ON_KEYS.includes(row.key),
+        AI_CREDIT_ADD_ON_KEYS_SET.has(row.key),
     );
     const nonAiAddOns = useMemo(
-        () => addOns.filter((row) => !AI_CREDIT_ADD_ON_KEYS.includes(row.key)),
+        () => addOns.filter((row) => !AI_CREDIT_ADD_ON_KEYS_SET.has(row.key)),
         [addOns],
     );
     const commitAiCreditDraft = (): void => {

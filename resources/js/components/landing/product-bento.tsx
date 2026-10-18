@@ -83,16 +83,18 @@ function TaxPanel() {
     );
 }
 
-function NotificationsPanel() {
-    const items = [
-        { icon: Mail, label: 'Invoice #014 delivered', time: '2m', unread: true },
-        { icon: MessageCircle, label: 'Payment reminder sent · WhatsApp', time: '1h', unread: true },
-        { icon: Bell, label: 'Payment matched to invoice #014', time: '3h', unread: false },
-    ];
+// Performance optimization: Module-level static declaration prevents re-allocating
+// array items and objects on every NotificationsPanel re-render.
+const NOTIFICATION_ITEMS = [
+    { icon: Mail, label: 'Invoice #014 delivered', time: '2m', unread: true },
+    { icon: MessageCircle, label: 'Payment reminder sent · WhatsApp', time: '1h', unread: true },
+    { icon: Bell, label: 'Payment matched to invoice #014', time: '3h', unread: false },
+] as const;
 
+function NotificationsPanel() {
     return (
         <div>
-            {items.map(({ icon: Icon, label, time, unread }) => (
+            {NOTIFICATION_ITEMS.map(({ icon: Icon, label, time, unread }) => (
                 <div
                     key={label}
                     className="flex items-center gap-3 border-b border-ink-border py-3 last:border-b-0"
