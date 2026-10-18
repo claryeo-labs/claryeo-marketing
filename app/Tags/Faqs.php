@@ -18,6 +18,8 @@ class Faqs extends Tags
      */
     public function index(): array
     {
-        return FaqBank::get((string) $this->params->get('key'));
+        $key = $this->params->get('key');
+
+        return is_string($key) ? FaqBank::get($key) : [];
     }
 }
