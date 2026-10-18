@@ -862,6 +862,7 @@ const TaxCalculatorPage: FC = () => {
                                     <ToggleGroup
                                         type="single"
                                         value={mode}
+                                        aria-label="Calculation mode"
                                         onValueChange={(value) => {
                                             if (value) {
                                                 setMode(
@@ -1070,6 +1071,7 @@ const TaxCalculatorPage: FC = () => {
                                                 ? employeeEarningsEntryMode
                                                 : businessEarningsEntryMode
                                         }
+                                        aria-label="Earnings entry mode"
                                         onValueChange={(value) => {
                                             if (!value) {
                                                 return;
@@ -1574,6 +1576,7 @@ const TaxCalculatorPage: FC = () => {
                                                 ? employeeDeductionsEntryMode
                                                 : businessDeductionsEntryMode
                                         }
+                                        aria-label="Deductions entry mode"
                                         onValueChange={(value) => {
                                             if (!value) {
                                                 return;
@@ -2207,6 +2210,7 @@ const TaxCalculatorPage: FC = () => {
                                 <ToggleGroup
                                     type="single"
                                     value={selectedPeriod}
+                                    aria-label="Summary calculation frequency"
                                     onValueChange={(value) => {
                                         if (value) {
                                             setSelectedPeriod(

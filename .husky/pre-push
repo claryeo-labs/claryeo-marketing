@@ -1,0 +1,4 @@
+# Lint only the commits being pushed (catches commits made with --no-verify).
+# Base: the branch's upstream, else where it forked from staging.
+base=$(git rev-parse --verify -q '@{u}' || git merge-base origin/staging HEAD)
+pnpm exec commitlint --from "$base" --to HEAD

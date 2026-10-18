@@ -119,6 +119,10 @@ class WaitlistProxyTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['answers']);
 
+        $this->postJson('/waitlist', [...$this->signup, 'consent' => 'not-a-boolean'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['consent']);
+
         Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), '/waitlist'));
     }
 

@@ -16,6 +16,9 @@ abstract class TestCase extends BaseTestCase
 
         Carbon::setTestNow('2026-07-01');
 
+        // CI never builds assets, so no test may need public/build/manifest.json.
+        $this->withoutVite();
+
         // Every page view asks the main app for the waitlist switch (see
         // App\Support\SiteMode). Unfaked calls fail fast instead of hitting
         // the network, so SiteMode falls back to config('marketing.waitlist_mode').
