@@ -49,6 +49,10 @@ const PricingProPlanCard = memo(({
             : PRO_MARKETING_FEATURES);
     const defaultCtaLabel =
         tier === 'growth' ? 'Subscribe to Growth' : 'Upgrade to Pro';
+    const ctaText = ctaLabel ?? defaultCtaLabel;
+    const ctaAriaLabel = ctaText.toLowerCase().includes(plan.name.toLowerCase())
+        ? `${ctaText} (${billing === 'annual' ? 'billed annually' : 'billed monthly'})`
+        : `${ctaText} (${plan.name} plan, ${billing === 'annual' ? 'billed annually' : 'billed monthly'})`;
     const ribbonLabel = popularLabel ?? (tier === 'pro' ? 'Most popular' : '');
     const [priceValue, priceCadence] = headlinePrice
         .split('/')
@@ -88,21 +92,22 @@ const PricingProPlanCard = memo(({
                 {ctaDisabled ? (
                     <span
                         aria-disabled="true"
+                        aria-label={ctaAriaLabel}
                         className="mt-auto flex w-full cursor-not-allowed items-center justify-center rounded-xl bg-muted/60 px-4 py-3 text-sm font-semibold text-muted-foreground"
                     >
-                        {ctaLabel ?? defaultCtaLabel}
+                        {ctaText}
                     </span>
                 ) : (
                     <a
                         href={ctaHref}
-                        aria-label={`${ctaLabel ?? defaultCtaLabel} for ${plan.name} plan (${billing === 'annual' ? 'billed annually' : 'billed monthly'})`}
+                        aria-label={ctaAriaLabel}
                         className={`mt-auto flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                             isPopular
                                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                                 : 'bg-muted text-foreground hover:bg-muted/80 dark:bg-muted/70 dark:hover:bg-muted'
                         }`}
                     >
-                        {ctaLabel ?? defaultCtaLabel}
+                        {ctaText}
                     </a>
                 )}
             </div>
