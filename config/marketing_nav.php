@@ -29,6 +29,7 @@ return [
                     ['label' => 'Expenses', 'href' => '/blog/category/expenses'],
                     ['label' => 'Running a business', 'href' => '/blog/category/business'],
                     ['label' => 'Product updates', 'href' => '/blog/category/product'],
+                    ['label' => 'Changelog', 'href' => '/changelog'],
                 ],
             ],
             [
@@ -60,6 +61,7 @@ return [
         ['group' => 'Product', 'items' => [
             ['title' => 'Features', 'href' => '/features'],
             ['title' => 'Pricing', 'href' => '/pricing'],
+            ['title' => 'Changelog', 'href' => '/changelog'],
             ['title' => 'Get started', 'href' => '/get-started'],
         ]],
         ['group' => 'Resources', 'items' => [

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogViewController;
+use App\Http\Controllers\ChangelogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\FeatureController;
 use App\Http\Controllers\GetStartedController;
@@ -72,6 +73,15 @@ Route::view('glossary', 'glossary.index', [
     'meta_description' => 'Plain-English definitions of Nigerian tax terms: PAYE, PIT, CIT, VAT, WHT, TIN, rent relief and more, each with a worked example on the 2026 rules.',
 ])->name('glossary');
 
+// Changelog. Entries are written in the main app and read over its internal
+// API (ChangelogController). /changelog/{YYYY-MM-DD-id} is one release.
+Route::controller(ChangelogController::class)->group(function (): void {
+    Route::get('changelog', 'index')->name('changelog');
+    Route::get('changelog/page/{page}', 'index')->whereNumber('page')->name('changelog.page');
+    Route::get('changelog/rss.xml', 'rss')->name('changelog.rss');
+    Route::get('changelog/{slug}', 'show')->where('slug', '\d{4}-\d{2}-\d{2}-[a-z0-9-]+')->name('changelog.show');
+});
+
 Route::get('get-started', GetStartedController::class)->name('get-started');
 
 Route::get('tax-calculator', [TaxCalculatorController::class, 'show'])->name('taxCalculator');
@@ -137,7 +147,7 @@ Route::get('sitemap.xml', function (SiteMode $siteMode) {
             ->header('Content-Type', 'application/xml');
     }
 
-    $urls = ['/', '/features', '/about', '/tax-calculator', '/contact', '/blog', '/guides', '/glossary'];
+    $urls = ['/', '/features', '/about', '/tax-calculator', '/contact', '/blog', '/guides', '/glossary', '/changelog'];
 
     foreach (array_keys((array) config('feature_pages', [])) as $slug) {
         $urls[] = '/features/'.$slug;
@@ -221,6 +231,7 @@ Route::get('llms.txt', function () {
     $lines[] = '- [Blog]('.url('/blog').'): practical guides on invoicing, VAT, bank sync and Nigerian tax';
     $lines[] = '- [All guides]('.url('/guides').')';
     $lines[] = '- [Glossary]('.url('/glossary').')';
+    $lines[] = '- [Changelog]('.url('/changelog').'): new features, improvements and fixes, newest first';
     $lines[] = '- [About]('.url('/about').')';
     $lines[] = '- [Contact]('.url('/contact').')';
 

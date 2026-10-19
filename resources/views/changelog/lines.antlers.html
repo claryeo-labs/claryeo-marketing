@@ -1,0 +1,16 @@
+{{# Fixes or Improvements: closed by default, one line each behind an area chip. #}}
+<details class="changelog-lines group border-b border-border">
+    <summary class="flex cursor-pointer list-none items-center gap-3 py-4 text-sm font-medium text-foreground [&::-webkit-details-marker]:hidden">
+        <span class="flex-1">{{ label }}</span>
+        <span class="text-xs text-muted-foreground tabular-nums">{{ lines | count }}</span>
+        <svg aria-hidden="true" class="size-4 text-muted-foreground transition-transform duration-200 group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </summary>
+    <ul class="grid gap-3 pb-6 text-[15px] leading-relaxed text-muted-foreground">
+        {{ lines }}
+            <li class="flex items-start gap-3">
+                <span class="changelog-chip" data-area="{{ area }}">{{ area_label }}</span>
+                <span class="text-foreground/80">{{ text }}</span>
+            </li>
+        {{ /lines }}
+    </ul>
+</details>

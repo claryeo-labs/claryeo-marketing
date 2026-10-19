@@ -1,0 +1,45 @@
+{{#
+    One release, used by the list (heading="h2", linked title) and the entry
+    page (heading="h1"). body_html comes from the main app already rendered
+    and sanitised (ChangelogMarkdown: raw HTML stripped), so it is output raw.
+#}}
+<article class="changelog-entry min-w-0">
+    {{ if heading == "h1" }}
+        <h1 class="changelog-title-lg text-foreground">{{ title }}</h1>
+    {{ else }}
+        <h2 class="changelog-title text-foreground">
+            <a href="{{ url }}" class="transition-colors hover:text-primary">{{ title }}</a>
+        </h2>
+    {{ /if }}
+
+    {{ if video }}
+        <figure class="changelog-hero">
+            <video src="{{ video }}" {{ if image }}poster="{{ image }}"{{ /if }} autoplay muted loop playsinline controls preload="metadata" aria-label="{{ title | sanitize }}"></video>
+        </figure>
+    {{ elseif image }}
+        <figure class="changelog-hero">
+            <img src="{{ image }}" alt="{{ title | sanitize }}" {{ if heading != "h1" }}loading="lazy"{{ /if }} decoding="async">
+        </figure>
+    {{ /if }}
+
+    <div class="prose-changelog mt-8">
+        {{ body_html }}
+    </div>
+
+    {{ if fixes || improvements }}
+        <div class="mt-10 border-t border-border">
+            {{ if improvements }}
+                {{ partial:changelog/lines label="Improvements" :lines="improvements" }}
+            {{ /if }}
+            {{ if fixes }}
+                {{ partial:changelog/lines label="Fixes" :lines="fixes" }}
+            {{ /if }}
+        </div>
+    {{ /if }}
+
+    {{ if link }}
+        <a href="{{ link:href }}" class="mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-opacity hover:opacity-80">
+            {{ link:label }} <span aria-hidden="true">&rarr;</span>
+        </a>
+    {{ /if }}
+</article>

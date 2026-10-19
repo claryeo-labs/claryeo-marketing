@@ -1,0 +1,49 @@
+{{ partial:shell }}
+    <div class="mx-auto max-w-[1180px] px-4 pt-12 pb-20 md:px-0 md:pt-16">
+        <header class="flex flex-col gap-8 border-b border-border pb-10 md:flex-row md:items-end md:justify-between">
+            <div class="max-w-xl">
+                <h1 class="changelog-masthead text-foreground">Changelog</h1>
+                <p class="mt-4 text-[17px] leading-relaxed text-muted-foreground">
+                    New features, improvements and fixes in Claryeo, newest first.
+                </p>
+            </div>
+            {{# Search + subscribe. The fallback keeps the feed reachable without JS. #}}
+            <div data-island="changelog-tools" data-props="{{ tools_props }}" class="md:min-w-[320px]">
+                <a href="/changelog/rss.xml" class="t-label text-muted-foreground transition-colors hover:text-primary">RSS feed</a>
+            </div>
+        </header>
+
+        {{ if entries }}
+            <ol class="changelog-timeline">
+                {{ entries }}
+                    <li class="changelog-release">
+                        <div class="changelog-rail">
+                            <span class="changelog-dot {{ if is_latest }}is-latest{{ /if }}" aria-hidden="true"></span>
+                            <a href="{{ url }}" class="changelog-date transition-colors hover:text-foreground">
+                                <time datetime="{{ date }}">{{ date_label }}</time>
+                            </a>
+                        </div>
+                        {{ partial:changelog/entry heading="h2" }}
+                    </li>
+                {{ /entries }}
+            </ol>
+
+            {{ if newer_url || older_url }}
+                <nav class="mt-4 flex items-center justify-between border-t border-border pt-6 text-sm" aria-label="Changelog pages">
+                    {{ if newer_url }}
+                        <a href="{{ newer_url }}" class="text-muted-foreground transition-colors hover:text-foreground">&larr; Newer updates</a>
+                    {{ else }}<span></span>{{ /if }}
+                    {{ if older_url }}
+                        <a href="{{ older_url }}" class="text-muted-foreground transition-colors hover:text-foreground">Older updates &rarr;</a>
+                    {{ /if }}
+                </nav>
+            {{ /if }}
+        {{ else }}
+            <p class="mt-16 max-w-md text-muted-foreground">
+                The changelog can’t be loaded right now. Please try again in a minute.
+            </p>
+        {{ /if }}
+    </div>
+
+    {{ partial:cta heading="Invoicing, expenses and tax, in one place" body="Built for freelancers and small businesses in Nigeria." }}
+{{ /partial:shell }}
