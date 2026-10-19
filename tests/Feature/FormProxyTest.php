@@ -40,6 +40,22 @@ class FormProxyTest extends TestCase
             && $request['client_ip'] !== null);
     }
 
+    public function test_contact_store_rejects_filled_honeypot_without_calling_api(): void
+    {
+        Http::fake();
+
+        $response = $this->postJson('/contact', [
+            'email' => 'ada@example.com',
+            'message' => 'Hello team, I would like help with my account.',
+            'website' => 'http://spam-bot.com',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('detail', 'Please try again.');
+
+        Http::assertNothingSent();
+    }
+
     public function test_contact_store_truncates_oversized_user_agent(): void
     {
         Http::fake(['web.test/api/internal/contact' => Http::response(['data' => ['id' => 8]], 201)]);

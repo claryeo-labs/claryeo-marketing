@@ -31,6 +31,13 @@ class ContactController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        // Security: Honeypot check to prevent automated bot / spam form submissions.
+        // A real user never sees or fills `website`; anything in it is a bot.
+        $honeypot = $request->input('website');
+        if (is_string($honeypot) ? trim($honeypot) !== '' : $honeypot !== null) {
+            return response()->json(['detail' => 'Please try again.'], 422);
+        }
+
         // Validated here as well as in the main app so the limits the form
         // enforces (the 1000-char counter, the optional phone) can't drift
         // from what gets proxied. Keep MESSAGE_MAX in the contact island and

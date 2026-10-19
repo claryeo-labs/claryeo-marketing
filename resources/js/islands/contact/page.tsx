@@ -322,6 +322,17 @@ const Contact: FC<ContactProps> = ({
                                     </span>
                                 </div>
                             </div>
+                            {/* Security: Honeypot field off-screen to trap automated spam bots */}
+                            <div className="sr-only" aria-hidden="true">
+                                <label htmlFor="website">Leave this field empty</label>
+                                <input
+                                    id="website"
+                                    name="website"
+                                    type="text"
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                />
+                            </div>
                             <Button
                                 type="submit"
                                 disabled={processing}
