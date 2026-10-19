@@ -26,18 +26,17 @@
     </div>
 
     {{ partial:cta heading="Invoicing, expenses and tax, in one place" body="Built for freelancers and small businesses in Nigeria." }}
-{{ /partial:shell }}
-
-<script>
-    (function () {
-        var button = document.querySelector('[data-copy-link]');
-        if (!button || !navigator.clipboard) return;
-        var label = button.querySelector('[data-copy-label]');
-        button.addEventListener('click', function () {
-            navigator.clipboard.writeText(window.location.href).then(function () {
-                label.textContent = 'Link copied';
-                setTimeout(function () { label.textContent = 'Share'; }, 2000);
+    <script>
+        (function () {
+            var button = document.querySelector('[data-copy-link]');
+            if (!button || !navigator.clipboard) return;
+            var label = button.querySelector('[data-copy-label]');
+            button.addEventListener('click', function () {
+                navigator.clipboard.writeText(window.location.href).then(function () {
+                    label.textContent = 'Link copied';
+                    setTimeout(function () { label.textContent = 'Share'; }, 2000);
+                });
             });
-        });
-    })();
-</script>
+        })();
+    </script>
+{{ /partial:shell }}

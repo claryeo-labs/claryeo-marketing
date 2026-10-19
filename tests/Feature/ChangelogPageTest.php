@@ -109,4 +109,46 @@ class ChangelogPageTest extends TestCase
 
         $this->get('/changelog')->assertOk()->assertSee('can’t be loaded right now');
     }
+
+    public function test_a_row_with_an_impossible_date_is_skipped_and_the_next_is_latest(): void
+    {
+        Http::fake(['web.test/api/internal/changelog' => Http::response(['data' => [
+            ['id' => 'broken', 'date' => '2026-13-45', 'title' => 'Broken', 'summary' => '', 'body_html' => ''],
+            ['id' => 'good', 'date' => '2026-10-01', 'title' => 'Good release', 'summary' => '', 'body_html' => ''],
+        ]])]);
+
+        $this->get('/changelog')
+            ->assertOk()
+            ->assertSee('Good release')
+            ->assertDontSee('>Broken<', false)
+            ->assertSee('changelog-dot is-latest', false);
+    }
+
+    public function test_an_absurd_page_number_is_not_found(): void
+    {
+        $this->fakeChangelog();
+
+        $this->get('/changelog/page/99999999999999999999')->assertNotFound();
+    }
+
+    public function test_entry_page_is_unavailable_and_rss_empty_when_the_api_is_down(): void
+    {
+        Http::fake(['web.test/api/internal/changelog' => Http::response([], 500)]);
+
+        $this->get('/changelog/2026-10-08-release-0')->assertServiceUnavailable();
+
+        $xml = simplexml_load_string((string) $this->get('/changelog/rss.xml')->assertOk()->getContent());
+        $this->assertNotFalse($xml);
+        $this->assertCount(0, $xml->channel->item);
+    }
+
+    public function test_the_changelog_stays_public_in_waitlist_mode(): void
+    {
+        config()->set('marketing.waitlist_mode', true);
+        $this->fakeChangelog();
+
+        $this->get('/changelog')->assertOk()->assertSee('Release 0');
+        $this->get('/changelog/2026-10-08-release-0')->assertOk();
+        $this->get('/changelog/rss.xml')->assertOk();
+    }
 }

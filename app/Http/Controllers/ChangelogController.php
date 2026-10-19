@@ -49,7 +49,13 @@ class ChangelogController extends Controller
 
     public function show(string $slug): View
     {
-        $entry = collect($this->entries())->firstWhere('slug', $slug);
+        $entries = $this->entries();
+
+        // No entries at all means the main app is unreachable with nothing
+        // cached: a temporary failure, not a missing page.
+        abort_if($entries === [], HttpResponse::HTTP_SERVICE_UNAVAILABLE);
+
+        $entry = collect($entries)->firstWhere('slug', $slug);
 
         abort_if($entry === null, HttpResponse::HTTP_NOT_FOUND);
 
@@ -79,16 +85,21 @@ class ChangelogController extends Controller
     {
         $entries = [];
 
-        foreach ($this->api->changelog() as $index => $row) {
+        foreach ($this->api->changelog() as $row) {
             $id = $row['id'] ?? null;
             $date = $row['date'] ?? null;
             $title = $row['title'] ?? null;
 
-            if (! is_string($id) || ! is_string($date) || ! is_string($title) || preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) !== 1) {
+            // A real calendar date or the row is skipped: one bad row must not
+            // take down every changelog page.
+            $day = is_string($date) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) === 1
+                ? rescue(fn () => CarbonImmutable::createFromFormat('!Y-m-d', $date), null, report: false)
+                : null;
+
+            if (! is_string($id) || ! is_string($date) || ! is_string($title) || ! $day instanceof CarbonImmutable || $day->format('Y-m-d') !== $date) {
                 continue;
             }
 
-            $day = CarbonImmutable::parse($date);
             $slug = "{$date}-{$id}";
 
             $entries[] = [
@@ -98,7 +109,7 @@ class ChangelogController extends Controller
                 'date' => $date,
                 'date_label' => $day->format('F j, Y'),
                 'date_rfc' => $day->toRfc2822String(),
-                'is_latest' => $index === 0,
+                'is_latest' => $entries === [],
                 'title' => $title,
                 'summary' => is_string($row['summary'] ?? null) ? $row['summary'] : '',
                 'image' => is_string($row['image'] ?? null) ? $row['image'] : null,

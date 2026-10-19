@@ -77,7 +77,7 @@ Route::view('glossary', 'glossary.index', [
 // API (ChangelogController). /changelog/{YYYY-MM-DD-id} is one release.
 Route::controller(ChangelogController::class)->group(function (): void {
     Route::get('changelog', 'index')->name('changelog');
-    Route::get('changelog/page/{page}', 'index')->whereNumber('page')->name('changelog.page');
+    Route::get('changelog/page/{page}', 'index')->where('page', '[0-9]{1,4}')->name('changelog.page');
     Route::get('changelog/rss.xml', 'rss')->name('changelog.rss');
     Route::get('changelog/{slug}', 'show')->where('slug', '\d{4}-\d{2}-\d{2}-[a-z0-9-]+')->name('changelog.show');
 });
@@ -141,7 +141,7 @@ Route::get('sitemap.xml', function (SiteMode $siteMode) {
     if ($siteMode->waitlist()) {
         return response()
             ->view('sitemap', [
-                'urls' => array_map(fn (string $path): string => url($path), ['/', '/privacy', '/terms', '/cookies']),
+                'urls' => array_map(fn (string $path): string => url($path), ['/', '/privacy', '/terms', '/cookies', '/changelog']),
                 'include_collections' => false,
             ])
             ->header('Content-Type', 'application/xml');
