@@ -1,0 +1,42 @@
+{{ partial:shell }}
+    <div class="mx-auto max-w-[1180px] px-4 pt-10 pb-20 md:px-0 md:pt-14">
+        <div class="changelog-release is-single">
+            <div class="changelog-rail">
+                <a href="/changelog" class="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
+                    <span aria-hidden="true">&larr;</span> Changelog
+                </a>
+            </div>
+            <div class="min-w-0">
+                {{ entry }}
+                    <div class="mb-8 flex items-center justify-between gap-4 border-b border-border pb-4">
+                        <time datetime="{{ date }}" class="changelog-date">{{ date_label }}</time>
+                        <button
+                            type="button"
+                            data-copy-link
+                            class="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                            <svg aria-hidden="true" class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            <span data-copy-label>Share</span>
+                        </button>
+                    </div>
+                    {{ partial:changelog/entry heading="h1" }}
+                {{ /entry }}
+            </div>
+        </div>
+    </div>
+
+    {{ partial:cta heading="Invoicing, expenses and tax, in one place" body="Built for freelancers and small businesses in Nigeria." }}
+    <script>
+        (function () {
+            var button = document.querySelector('[data-copy-link]');
+            if (!button || !navigator.clipboard) return;
+            var label = button.querySelector('[data-copy-label]');
+            button.addEventListener('click', function () {
+                navigator.clipboard.writeText(window.location.href).then(function () {
+                    label.textContent = 'Link copied';
+                    setTimeout(function () { label.textContent = 'Share'; }, 2000);
+                });
+            });
+        })();
+    </script>
+{{ /partial:shell }}

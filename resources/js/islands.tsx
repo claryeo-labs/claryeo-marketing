@@ -32,6 +32,7 @@ const registry = {
     'get-started': () => import('./islands/get-started/page'),
     'legal-document': () => import('./islands/legal/document'),
     'legal-versions': () => import('./islands/legal/versions'),
+    'changelog-tools': () => import('./islands/changelog/tools'),
     'site-cta': () => import('./components/site-cta'),
     // Waitlist mode (views/waitlist/*, ported from claryeo-waitlist).
     'waitlist-landing': () => import('./islands/waitlist/landing'),
