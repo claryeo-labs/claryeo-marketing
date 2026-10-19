@@ -33,7 +33,7 @@ class ChangelogPageTest extends TestCase
                 'summary' => "Summary {$i}",
                 'link' => ['label' => 'Open the Inbox', 'href' => 'https://app.test/inbox'],
                 'image' => $i === 0 ? 'https://app.test/changelog/release-0/hero.png' : null,
-                'video' => null,
+                'video' => $i === 1 ? 'https://app.test/changelog/release-1/hero.mp4' : null,
                 'body_html' => "<p>Body {$i}</p><figure class=\"changelog-media\"><img src=\"https://app.test/a.png\" alt=\"A\"><figcaption>Caption {$i}</figcaption></figure>",
                 'fixes' => [['area' => 'invoices', 'area_label' => 'Invoices', 'text' => "Fixed thing {$i}."]],
                 'improvements' => [],
@@ -52,11 +52,13 @@ class ChangelogPageTest extends TestCase
             ->assertSee('October 8, 2026')
             ->assertSee('<a href="/changelog/2026-10-08-release-0"', false)
             ->assertSee('<figcaption>Caption 0</figcaption>', false)
-            ->assertSee('src="https://app.test/changelog/release-0/hero.png"', false)
+            ->assertSee('src="https://app.test/changelog/release-0/hero.png" alt="Release 0" fetchpriority="high"', false)
             ->assertSee('data-area="invoices"', false)
             ->assertSee('Fixed thing 1.')
             ->assertSee('changelog-dot is-latest', false)
-            ->assertSee('data-island="changelog-tools"', false);
+            ->assertSee('data-island="changelog-tools"', false)
+            ->assertSee('data-autoplay muted loop playsinline controls preload="none"', false)
+            ->assertDontSee(' autoplay ', false);
     }
 
     public function test_list_pages_by_ten_and_404s_past_the_end(): void
