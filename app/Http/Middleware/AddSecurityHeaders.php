@@ -30,8 +30,8 @@ class AddSecurityHeaders
         $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
         $response->headers->set('X-Permitted-Cross-Domain-Policies', 'none');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
-        // Defense in depth: Restrict frame-ancestors, forbid plugin execution, and constrain base tag URLs.
-        $response->headers->set('Content-Security-Policy', "base-uri 'self'; object-src 'none'; frame-ancestors 'self'");
+        // Defense in depth: Restrict form submission targets, frame-ancestors, forbid plugin execution, and constrain base tag URLs.
+        $response->headers->set('Content-Security-Policy', "base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'");
 
         return $response;
     }
