@@ -46,6 +46,7 @@ function CircularProgress({
             aria-valuenow={percentage}
             aria-valuemin={0}
             aria-valuemax={100}
+            aria-valuetext={`${percentage}%`}
             className="flex shrink-0 items-center gap-2"
         >
             <div
@@ -53,6 +54,7 @@ function CircularProgress({
                 style={{ width: size, height: size }}
             >
                 <svg
+                    aria-hidden="true"
                     className="-rotate-90 transform"
                     width={size}
                     height={size}
@@ -100,7 +102,7 @@ function CircularProgress({
 
 function BusinessIcon({ className }: { className?: string }) {
     return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
+        <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
             <rect x="2" y="7" width="20" height="14" rx="2" fill="#10B981" />
             <rect x="2" y="7" width="20" height="5" fill="#059669" />
             <path
@@ -141,6 +143,7 @@ function EyeToggle({
         >
             <span className="relative block h-4 w-4 overflow-hidden">
                 <Eye
+                    aria-hidden="true"
                     className={cn(
                         'absolute inset-0 h-4 w-4 transition-all duration-300 ease-out',
                         visible
@@ -149,6 +152,7 @@ function EyeToggle({
                     )}
                 />
                 <EyeOff
+                    aria-hidden="true"
                     className={cn(
                         'absolute inset-0 h-4 w-4 transition-all duration-300 ease-out',
                         visible
