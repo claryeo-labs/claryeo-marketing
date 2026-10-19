@@ -14,11 +14,12 @@
 
     {{ if video }}
         <figure class="changelog-hero">
-            <video src="{{ video }}" {{ if image }}poster="{{ image }}"{{ /if }} autoplay muted loop playsinline controls preload="metadata" aria-label="{{ title | sanitize }}"></video>
+            <video src="{{ video }}" {{ if image }}poster="{{ image }}"{{ /if }} data-autoplay muted loop playsinline controls preload="none" aria-label="{{ title | sanitize }}"></video>
         </figure>
     {{ elseif image }}
         <figure class="changelog-hero">
-            <img src="{{ image }}" alt="{{ title | sanitize }}" {{ if heading != "h1" }}loading="lazy"{{ /if }} decoding="async">
+            {{# The first hero on screen loads straight away; every other image waits. #}}
+            <img src="{{ image }}" alt="{{ title | sanitize }}" {{ if heading == "h1" || is_latest }}fetchpriority="high"{{ else }}loading="lazy"{{ /if }} decoding="async">
         </figure>
     {{ /if }}
 
