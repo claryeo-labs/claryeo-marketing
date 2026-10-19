@@ -40,6 +40,9 @@ class WaitlistTakeover
         'terms', 'terms/*',
         'cookies', 'cookies/*',
         'contact', 'contact/*',
+        // The app's "Full changelog" links (and its 301 from /help/whats-new)
+        // land here, so the changelog stays public in waitlist mode too.
+        'changelog', 'changelog/*',
         'sitemap.xml',
         'robots.txt',
         'llms.txt',

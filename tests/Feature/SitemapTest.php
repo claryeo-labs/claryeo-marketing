@@ -37,7 +37,7 @@ class SitemapTest extends TestCase
         $this->assertStringNotContainsString('/quiz</loc>', $body);
     }
 
-    public function test_sitemap_lists_only_home_and_legal_pages_in_waitlist_mode(): void
+    public function test_sitemap_lists_only_home_legal_and_changelog_in_waitlist_mode(): void
     {
         config()->set('marketing.waitlist_mode', true);
 
@@ -47,7 +47,7 @@ class SitemapTest extends TestCase
         preg_match_all('#<loc>([^<]+)</loc>#', $response->getContent() ?: '', $matches);
 
         $this->assertSame(
-            [url('/'), url('/privacy'), url('/terms'), url('/cookies')],
+            [url('/'), url('/privacy'), url('/terms'), url('/cookies'), url('/changelog')],
             $matches[1],
         );
     }

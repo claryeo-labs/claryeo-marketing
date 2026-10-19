@@ -68,6 +68,19 @@ class MainApi
     }
 
     /**
+     * Every changelog entry, newest first (the app's `changelog/*.md`).
+     * Entries only change when the app deploys, so the normal TTL is plenty.
+     *
+     * @return list<array<mixed>>
+     */
+    public function changelog(): array
+    {
+        $entries = $this->cachedGet('marketing:changelog', 'changelog', []);
+
+        return array_values(array_filter($entries, 'is_array'));
+    }
+
+    /**
      * Submit a contact message. Not cached.
      *
      * @param  array<string, mixed>  $payload

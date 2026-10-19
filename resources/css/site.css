@@ -361,6 +361,127 @@
         @apply prose-a:text-primary prose-a:underline prose-a:underline-offset-4;
         @apply prose-img:w-full prose-img:rounded-lg prose-img:border prose-img:border-border;
     }
+
+    /* --- Changelog (/changelog). Whole releases on one page, Linear's model:
+       a date rail on the left whose dot marks each release (the newest in
+       the brand violet), the release at reading width on the right. --- */
+    .changelog-timeline {
+        @apply relative;
+    }
+
+    /* Changelog type: a reading surface, so one family (Instrument Sans) in
+       a medium-weight ramp with only a touch of negative tracking. Semibold
+       with tight tracking read cramped at display sizes (Linear's changelog
+       sets its titles medium for the same reason). */
+    .changelog-masthead {
+        @apply font-sans text-[40px] leading-[1.1] font-medium tracking-[-0.02em] md:text-[52px];
+    }
+
+    .changelog-title {
+        @apply font-sans text-[24px] leading-[1.25] font-medium tracking-[-0.012em] text-balance md:text-[30px];
+    }
+
+    .changelog-title-lg {
+        @apply font-sans text-[30px] leading-[1.2] font-medium tracking-[-0.016em] text-balance md:text-[38px];
+    }
+
+    .changelog-date {
+        @apply font-sans text-[14px] font-normal text-foreground/70;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .changelog-release {
+        @apply relative grid gap-5 pt-14 pb-6 lg:grid-cols-[240px_minmax(0,680px)] lg:gap-16 lg:pt-20;
+    }
+
+    .changelog-release.is-single {
+        @apply pt-0;
+    }
+
+    /* The rail: one continuous hairline down the list, broken by each dot. */
+    .changelog-timeline::before {
+        content: '';
+        @apply absolute top-24 bottom-0 left-[3.5px] hidden w-px bg-border lg:block;
+    }
+
+    .changelog-rail {
+        @apply flex items-center gap-3 lg:sticky lg:top-24 lg:self-start;
+    }
+
+    .changelog-dot {
+        @apply relative z-10 hidden size-2 shrink-0 rounded-full border border-muted-foreground/50 bg-background lg:block;
+    }
+
+    .changelog-dot.is-latest {
+        @apply border-primary bg-primary;
+        box-shadow: 0 0 0 4px
+            color-mix(in oklab, var(--primary) 18%, transparent);
+    }
+
+    /* Media sits on a quiet stage: claryeo-media exports composed stills and
+       loops, so the frame only needs a hairline, a radius and a backdrop for
+       the moment before a video's first frame arrives. */
+    .changelog-hero,
+    .prose-changelog .changelog-media {
+        @apply mt-8 overflow-hidden rounded-xl border border-border bg-muted;
+    }
+
+    .changelog-hero img,
+    .changelog-hero video,
+    .prose-changelog .changelog-media img,
+    .prose-changelog .changelog-media video {
+        @apply m-0 block h-auto w-full rounded-none border-0;
+    }
+
+    .prose-changelog .changelog-media {
+        @apply my-10;
+    }
+
+    .prose-changelog .changelog-media figcaption {
+        @apply m-0 border-t border-border bg-background px-4 py-3 font-sans text-[13px] leading-snug text-muted-foreground;
+    }
+
+    .prose-changelog {
+        @apply prose prose-zinc dark:prose-invert max-w-none text-[16.5px] leading-[1.75];
+        @apply prose-p:text-foreground/80 prose-p:my-5 prose-li:text-foreground/80 prose-strong:text-foreground prose-strong:font-medium;
+        @apply prose-headings:font-sans prose-headings:font-medium prose-headings:text-foreground;
+        @apply prose-h2:mt-14 prose-h2:mb-3 prose-h2:text-[22px] prose-h2:leading-snug prose-h2:tracking-[-0.01em] prose-h3:mt-10 prose-h3:mb-2 prose-h3:text-[18px] prose-h3:tracking-[-0.005em];
+        @apply prose-a:text-foreground prose-a:underline prose-a:decoration-border prose-a:underline-offset-4 hover:prose-a:decoration-primary;
+        @apply prose-code:font-mono prose-code:text-[0.875em];
+    }
+
+    /* Area chip in Fixes / Improvements: a coloured dot + the area name.
+       Colours reuse the site's existing atmosphere tokens. */
+    .changelog-chip {
+        @apply mt-0.5 inline-flex h-6 shrink-0 items-center gap-1.5 rounded-full border border-border bg-background px-2.5 font-sans text-xs whitespace-nowrap text-muted-foreground;
+    }
+
+    .changelog-chip::before {
+        content: '';
+        @apply size-1.5 rounded-full bg-muted-foreground;
+    }
+
+    .changelog-chip[data-area='invoices']::before {
+        background: var(--primary);
+    }
+    .changelog-chip[data-area='payments']::before {
+        background: var(--atm-positive);
+    }
+    .changelog-chip[data-area='bank-sync']::before {
+        background: var(--atm-info);
+    }
+    .changelog-chip[data-area='expenses']::before {
+        background: var(--atm-pending);
+    }
+    .changelog-chip[data-area='reports']::before {
+        background: var(--atm-dawn);
+    }
+    .changelog-chip[data-area='tax']::before {
+        background: var(--atm-violet-bright);
+    }
+    .changelog-chip[data-area='clients']::before {
+        background: var(--atm-dusk);
+    }
 }
 
 @layer utilities {
