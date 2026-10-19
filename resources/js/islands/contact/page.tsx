@@ -322,7 +322,7 @@ const Contact: FC<ContactProps> = ({
                                     </span>
                                 </div>
                             </div>
-                            {/* Security: Honeypot field off-screen to trap automated spam bots */}
+                            {/* Security: Visually hidden honeypot field (1px clipped) to trap automated spam bots */}
                             <div className="sr-only" aria-hidden="true">
                                 <label htmlFor="website">Leave this field empty</label>
                                 <input

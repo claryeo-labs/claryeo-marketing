@@ -13,6 +13,8 @@ use Illuminate\Support\Str;
 
 class ContactController extends Controller
 {
+    private const HONEYPOT = 'Please try again.';
+
     public function __construct(private readonly MainApi $api) {}
 
     public function show(): View
@@ -35,7 +37,7 @@ class ContactController extends Controller
         // A real user never sees or fills `website`; anything in it is a bot.
         $honeypot = $request->input('website');
         if (is_string($honeypot) ? trim($honeypot) !== '' : $honeypot !== null) {
-            return response()->json(['detail' => 'Please try again.'], 422);
+            return response()->json(['detail' => self::HONEYPOT], 422);
         }
 
         // Validated here as well as in the main app so the limits the form
