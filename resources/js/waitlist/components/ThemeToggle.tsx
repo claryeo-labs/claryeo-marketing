@@ -142,19 +142,24 @@ export const ThemeToggle = () => {
     };
 
     const Icon = ICONS[mode];
+    const nextMode = CYCLE[(CYCLE.indexOf(mode) + 1) % CYCLE.length] as ThemeMode;
+
     return (
         <button
             ref={buttonRef}
             type="button"
-            className="theme-toggle"
+            className="theme-toggle rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             data-testid="theme-toggle"
             data-mode={mode}
             onClick={cycle}
             title={`Theme: ${LABELS[mode]}`}
-            aria-label={`Theme: ${LABELS[mode]}. Switch to ${LABELS[CYCLE[(CYCLE.indexOf(mode) + 1) % CYCLE.length] as ThemeMode]}`}
+            aria-label={`Theme: ${LABELS[mode]}. Switch to ${LABELS[nextMode]}`}
         >
             <span ref={iconRef} className="theme-toggle-icon">
                 <Icon size={17} />
+            </span>
+            <span className="sr-only" aria-live="polite">
+                {`Theme changed to ${LABELS[mode]}`}
             </span>
         </button>
     );
