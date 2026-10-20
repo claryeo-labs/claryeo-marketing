@@ -1,5 +1,6 @@
 import { CheckCircle2, Clock, FileText, AlertTriangle } from 'lucide-react';
 import type { FC } from 'react';
+import { memo } from 'react';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -49,16 +50,22 @@ function CollectionBar({ rate }: { rate: number }) {
     );
 }
 
-const InvoiceOverviewCard: FC<InvoiceOverviewCardProps> = ({
-    invoiceCount,
-    paidCount,
-    overdueCount,
-    pendingCount,
-    outstanding: _outstanding,
-    loading = false,
-    className,
-}) => {
-    const collectionRate =
+/**
+ * Performance optimization: Wrap InvoiceOverviewCard in React.memo() to prevent
+ * unnecessary re-renders of the invoice statistics and collection rate progress bar
+ * when consumed inside interactive parent islands or dashboard containers.
+ */
+const InvoiceOverviewCard: FC<InvoiceOverviewCardProps> = memo(
+    function InvoiceOverviewCard({
+        invoiceCount,
+        paidCount,
+        overdueCount,
+        pendingCount,
+        outstanding: _outstanding,
+        loading = false,
+        className,
+    }) {
+        const collectionRate =
         invoiceCount > 0 ? Math.round((paidCount / invoiceCount) * 100) : 0;
 
     if (loading) {
@@ -145,6 +152,8 @@ const InvoiceOverviewCard: FC<InvoiceOverviewCardProps> = ({
             </CardContent>
         </Card>
     );
-};
+});
+
+InvoiceOverviewCard.displayName = 'InvoiceOverviewCard';
 
 export default InvoiceOverviewCard;
