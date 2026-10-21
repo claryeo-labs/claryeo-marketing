@@ -37,7 +37,7 @@ function CopyField({ value }: { value: string }) {
                         setTimeout(() => setCopied(false), 2000);
                     })
                 }
-                className="grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+                className="grid size-7 place-items-center rounded-md text-muted-foreground transition-colors hover:bg-background hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
                 {copied ? (
                     <Check className="size-4 text-primary" />
@@ -62,6 +62,39 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
         },
     };
 
+    const tabList = Object.values(SubscribeTab);
+
+    const handleKeyDown = (
+        event: React.KeyboardEvent<HTMLButtonElement>,
+        currentValue: SubscribeTab,
+    ) => {
+        const currentIndex = tabList.indexOf(currentValue);
+        let nextIndex: number | null = null;
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            nextIndex = (currentIndex + 1) % tabList.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            nextIndex = (currentIndex - 1 + tabList.length) % tabList.length;
+        } else if (event.key === 'Home') {
+            event.preventDefault();
+            nextIndex = 0;
+        } else if (event.key === 'End') {
+            event.preventDefault();
+            nextIndex = tabList.length - 1;
+        }
+
+        if (nextIndex !== null) {
+            const nextTab = tabList[nextIndex];
+            setTab(nextTab);
+            const targetButton = document.getElementById(
+                `subscribe-tab-${nextTab}`,
+            );
+            targetButton?.focus();
+        }
+    };
+
     return (
         <Dialog.Root>
             <Dialog.Trigger
@@ -82,17 +115,22 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
                     </Dialog.Description>
                     <div
                         role="tablist"
+                        aria-label="Subscribe options"
                         className="mt-5 flex gap-5 border-b border-border"
                     >
-                        {Object.values(SubscribeTab).map((value) => (
+                        {tabList.map((value) => (
                             <button
                                 key={value}
+                                id={`subscribe-tab-${value}`}
                                 type="button"
                                 role="tab"
                                 aria-selected={tab === value}
+                                aria-controls={`subscribe-panel-${value}`}
+                                tabIndex={tab === value ? 0 : -1}
                                 onClick={() => setTab(value)}
+                                onKeyDown={(e) => handleKeyDown(e, value)}
                                 className={cn(
-                                    '-mb-px inline-flex items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors',
+                                    '-mb-px inline-flex items-center gap-1.5 rounded-t-sm border-b-2 pb-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                                     tab === value
                                         ? 'border-primary text-foreground'
                                         : 'border-transparent text-muted-foreground hover:text-foreground',
@@ -103,7 +141,12 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
                             </button>
                         ))}
                     </div>
-                    <div role="tabpanel" className="pt-5 text-sm">
+                    <div
+                        id={`subscribe-panel-${tab}`}
+                        role="tabpanel"
+                        aria-labelledby={`subscribe-tab-${tab}`}
+                        className="pt-5 text-sm"
+                    >
                         {tab === SubscribeTab.Rss ? (
                             <>
                                 <p className="text-muted-foreground">
@@ -231,6 +274,7 @@ function SearchDialog({ entries }: { entries: Entry[] }) {
                     <ul
                         className="max-h-[50vh] overflow-y-auto p-2"
                         role="listbox"
+                        aria-label="Search results"
                     >
                         {matches.map((entry, index) => (
                             <li
