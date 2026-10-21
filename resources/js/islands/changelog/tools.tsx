@@ -140,9 +140,13 @@ function useMatches(entries: Entry[], query: string): Entry[] {
         const inTitle = entries.filter((entry) =>
             entry.title.toLowerCase().includes(needle),
         );
+        // Performance optimization: Construct a Set for O(1) constant time lookups.
+        // Replaces O(M) linear array searching (!inTitle.includes(entry)) inside the
+        // summary filter loop, reducing filter time from O(N * M) to O(N).
+        const inTitleSet = new Set(inTitle);
         const inSummary = entries.filter(
             (entry) =>
-                !inTitle.includes(entry) &&
+                !inTitleSet.has(entry) &&
                 entry.summary.toLowerCase().includes(needle),
         );
 
