@@ -49,6 +49,9 @@ class ChangelogController extends Controller
 
     public function show(string $slug): View
     {
+        // Security: Validate $slug length and format to prevent resource consumption from malicious parameters
+        abort_if(strlen($slug) > 128 || preg_match('/^\d{4}-\d{2}-\d{2}-[a-z0-9-]+$/', $slug) !== 1, HttpResponse::HTTP_NOT_FOUND);
+
         $entries = $this->entries();
 
         // No entries at all means the main app is unreachable with nothing
