@@ -42,3 +42,7 @@
 ## 2026-11-10 - Memoization of Heavy Presentation Components with Canvas/Observer Subtrees
 **Learning:** Shared presentation components such as `SiteCta` render heavy child elements like `AtmosphereCanvas`, which set up Canvas 2D contexts, `ResizeObserver`, `IntersectionObserver`, and GSAP animation tweens. Unmemoized, these components re-render and re-evaluate child hooks whenever parent page islands re-render (even with unchanged props).
 **Action:** Wrap shared, prop-driven closing CTA or banner components containing animated canvas or observer subtrees in `React.memo()` to isolate them from parent component re-renders.
+
+## 2026-11-15 - Avoid Premature Memoization on Static Landers
+**Learning:** Wrapping static page components (`ProductBento`, `InvoiceOverviewCard`) in `React.memo()` adds overhead without benefit when parent containers hold no updating state to trigger re-renders. Additionally, wrapping function bodies without auto-formatting breaks indentation.
+**Action:** Verify that parent components actually re-render or hold updating state before adding `React.memo()`, and ensure code formatting/indentation is cleanly preserved.
