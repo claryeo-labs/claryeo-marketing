@@ -141,31 +141,36 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
                             </button>
                         ))}
                     </div>
-                    <div
-                        id={`subscribe-panel-${tab}`}
-                        role="tabpanel"
-                        aria-labelledby={`subscribe-tab-${tab}`}
-                        className="pt-5 text-sm"
-                    >
-                        {tab === SubscribeTab.Rss ? (
-                            <>
-                                <p className="text-muted-foreground">
-                                    Add this feed to your favourite RSS reader.
-                                </p>
-                                <CopyField value={rssUrl} />
-                            </>
-                        ) : (
-                            <>
-                                <p className="text-muted-foreground">
-                                    Paste this into any Slack channel to get
-                                    each release there.
-                                </p>
-                                <CopyField
-                                    value={`/feed subscribe ${rssUrl}`}
-                                />
-                            </>
-                        )}
-                    </div>
+                    {tabList.map((value) => (
+                        <div
+                            key={value}
+                            id={`subscribe-panel-${value}`}
+                            role="tabpanel"
+                            aria-labelledby={`subscribe-tab-${value}`}
+                            hidden={tab !== value}
+                            className="pt-5 text-sm"
+                        >
+                            {value === SubscribeTab.Rss ? (
+                                <>
+                                    <p className="text-muted-foreground">
+                                        Add this feed to your favourite RSS
+                                        reader.
+                                    </p>
+                                    <CopyField value={rssUrl} />
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-muted-foreground">
+                                        Paste this into any Slack channel to get
+                                        each release there.
+                                    </p>
+                                    <CopyField
+                                        value={`/feed subscribe ${rssUrl}`}
+                                    />
+                                </>
+                            )}
+                        </div>
+                    ))}
                 </Dialog.Content>
             </Dialog.Portal>
         </Dialog.Root>
