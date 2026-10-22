@@ -1,7 +1,9 @@
 # =============================================================================
 # Stage 1 – PHP base image (Statamic / Laravel)
 # =============================================================================
-FROM php:8.3-fpm-alpine AS base
+# Pinned to the exact patch: the floating 8.3 tag can stay on an old image
+# in the build cache. 8.3.36 fixes the PHP2Shell RCE (CVE-2026-109618/9).
+FROM php:8.3.36-fpm-alpine AS base
 
 LABEL org.opencontainers.image.title="Claryeo Marketing"
 LABEL org.opencontainers.image.source="https://github.com/claryeo-labs/claryeo-marketing"
