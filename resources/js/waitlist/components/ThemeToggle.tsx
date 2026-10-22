@@ -148,7 +148,7 @@ export const ThemeToggle = () => {
         <button
             ref={buttonRef}
             type="button"
-            className="theme-toggle rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="theme-toggle"
             data-testid="theme-toggle"
             data-mode={mode}
             onClick={cycle}
