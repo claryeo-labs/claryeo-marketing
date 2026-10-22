@@ -1,6 +1,6 @@
 import { Bell, Check, Copy, Rss, Search, Slack } from 'lucide-react';
 import { Dialog } from 'radix-ui';
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -51,6 +51,12 @@ function CopyField({ value }: { value: string }) {
 
 function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
     const [tab, setTab] = useState<SubscribeTab>(SubscribeTab.Rss);
+    const tabList = Object.values(SubscribeTab);
+    const tabRefs = useRef<Record<SubscribeTab, HTMLButtonElement | null>>({
+        [SubscribeTab.Rss]: null,
+        [SubscribeTab.Slack]: null,
+    });
+
     const tabs: Record<SubscribeTab, { label: string; icon: ReactNode }> = {
         [SubscribeTab.Rss]: {
             label: 'RSS',
@@ -60,6 +66,34 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
             label: 'Slack',
             icon: <Slack className="size-3.5" />,
         },
+    };
+
+    const handleKeyDown = (
+        event: React.KeyboardEvent<HTMLButtonElement>,
+        currentValue: SubscribeTab,
+    ) => {
+        const currentIndex = tabList.indexOf(currentValue);
+        let nextIndex = currentIndex;
+
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            event.preventDefault();
+            nextIndex = (currentIndex + 1) % tabList.length;
+        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            nextIndex = (currentIndex - 1 + tabList.length) % tabList.length;
+        } else if (event.key === 'Home') {
+            event.preventDefault();
+            nextIndex = 0;
+        } else if (event.key === 'End') {
+            event.preventDefault();
+            nextIndex = tabList.length - 1;
+        }
+
+        if (nextIndex !== currentIndex) {
+            const nextValue = tabList[nextIndex];
+            setTab(nextValue);
+            tabRefs.current[nextValue]?.focus();
+        }
     };
 
     return (
@@ -82,17 +116,27 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
                     </Dialog.Description>
                     <div
                         role="tablist"
+                        aria-label="Subscribe options"
                         className="mt-5 flex gap-5 border-b border-border"
                     >
-                        {Object.values(SubscribeTab).map((value) => (
+                        {tabList.map((value) => (
                             <button
                                 key={value}
+                                ref={(el) => {
+                                    tabRefs.current[value] = el;
+                                }}
+                                id={`tab-${value}`}
                                 type="button"
                                 role="tab"
                                 aria-selected={tab === value}
+                                aria-controls={`panel-${value}`}
+                                tabIndex={tab === value ? 0 : -1}
                                 onClick={() => setTab(value)}
+                                onKeyDown={(event) =>
+                                    handleKeyDown(event, value)
+                                }
                                 className={cn(
-                                    '-mb-px inline-flex items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors',
+                                    '-mb-px inline-flex items-center gap-1.5 border-b-2 pb-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                                     tab === value
                                         ? 'border-primary text-foreground'
                                         : 'border-transparent text-muted-foreground hover:text-foreground',
@@ -103,7 +147,12 @@ function SubscribeDialog({ rssUrl }: { rssUrl: string }) {
                             </button>
                         ))}
                     </div>
-                    <div role="tabpanel" className="pt-5 text-sm">
+                    <div
+                        id={`panel-${tab}`}
+                        role="tabpanel"
+                        aria-labelledby={`tab-${tab}`}
+                        className="pt-5 text-sm focus-visible:outline-none"
+                    >
                         {tab === SubscribeTab.Rss ? (
                             <>
                                 <p className="text-muted-foreground">
