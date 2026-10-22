@@ -155,14 +155,52 @@ export function calculateBusinessTax(
               input.profile.paye.bands,
           )
         : [];
-    // Performance optimization: Sum tax amounts directly from existing allocations
-    // instead of re-allocating bands via calculateProgressiveTax().
-    const pit = usesPit
-        ? pitBandAllocations.reduce(
-              (total, allocation) => total + allocation.taxAmount,
-              0,
-          )
-        : 0;
+
+    // Performance optimization: Accumulate PIT tax, chargeable income, and
+    // summary rows in a single pass over pitBandAllocations instead of running
+    // 4 separate .reduce() and .map() array iterations during real-time typing.
+    let pit = 0;
+    let pitTaxableIncomeAtChargeableRates = 0;
+    const pitTaxableBandRows: Array<{
+        key: string;
+        label: string;
+        detail: string;
+        annualAmount: number;
+        tone: 'muted';
+    }> = [];
+    const pitTaxBandRows: Array<{
+        key: string;
+        label: string;
+        detail: string;
+        annualAmount: number;
+        tone: 'muted';
+    }> = [];
+
+    if (usesPit) {
+        for (const allocation of pitBandAllocations) {
+            pit += allocation.taxAmount;
+            if (allocation.rate > 0) {
+                pitTaxableIncomeAtChargeableRates += allocation.taxableAmount;
+            }
+
+            pitTaxableBandRows.push({
+                key: `pit_taxable_band_${allocation.index + 1}`,
+                label: `PIT band ${allocation.index + 1} taxable income`,
+                detail: `${formatBandScope(allocation.index, allocation.lowerBound, allocation.cap)} at ${formatRate(allocation.rate)}`,
+                annualAmount: allocation.taxableAmount,
+                tone: 'muted' as const,
+            });
+
+            pitTaxBandRows.push({
+                key: `pit_tax_band_${allocation.index + 1}`,
+                label: `PIT band ${allocation.index + 1} tax`,
+                detail: `${formatRate(allocation.rate)} on ${formatNaira(allocation.taxableAmount)}`,
+                annualAmount: -allocation.taxAmount,
+                tone: 'muted' as const,
+            });
+        }
+    }
+
     const citRate = usesPit
         ? 0
         : qualifiesAsSmallCompany
@@ -180,32 +218,10 @@ export function calculateBusinessTax(
     const netIncome = turnover - allowableDeductions - totalTax;
     const standardCitRate = input.profile.business.cit.standardRate;
     const taxableIncomeAtChargeableRates = usesPit
-        ? pitBandAllocations.reduce((total, allocation) => {
-              if (allocation.rate <= 0) {
-                  return total;
-              }
-
-              return total + allocation.taxableAmount;
-          }, 0)
+        ? pitTaxableIncomeAtChargeableRates
         : qualifiesAsSmallCompany
           ? 0
           : taxableIncome;
-
-    const pitTaxableBandRows = pitBandAllocations.map((allocation) => ({
-        key: `pit_taxable_band_${allocation.index + 1}`,
-        label: `PIT band ${allocation.index + 1} taxable income`,
-        detail: `${formatBandScope(allocation.index, allocation.lowerBound, allocation.cap)} at ${formatRate(allocation.rate)}`,
-        annualAmount: allocation.taxableAmount,
-        tone: 'muted' as const,
-    }));
-
-    const pitTaxBandRows = pitBandAllocations.map((allocation) => ({
-        key: `pit_tax_band_${allocation.index + 1}`,
-        label: `PIT band ${allocation.index + 1} tax`,
-        detail: `${formatRate(allocation.rate)} on ${formatNaira(allocation.taxableAmount)}`,
-        annualAmount: -allocation.taxAmount,
-        tone: 'muted' as const,
-    }));
 
     const citBand1TaxableIncome = qualifiesAsSmallCompany ? taxableIncome : 0;
     const citBand2TaxableIncome = qualifiesAsSmallCompany ? 0 : taxableIncome;

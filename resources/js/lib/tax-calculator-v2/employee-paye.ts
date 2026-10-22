@@ -143,40 +143,53 @@ export function calculateEmployeePaye(
               taxableIncome,
               input.profile.paye.bands,
           );
-    // Performance optimization: Sum tax amounts directly from existing allocations
-    // instead of re-allocating bands via calculateProgressiveTax().
-    const paye = isMinimumWageExempt
-        ? 0
-        : payeBandAllocations.reduce(
-              (total, allocation) => total + allocation.taxAmount,
-              0,
-          );
 
-    const netPay = grossEmolument - deductibleLines - paye;
-    const taxableIncomeAtChargeableRates = payeBandAllocations.reduce(
-        (total, allocation) => {
-            if (allocation.rate <= 0) {
-                return total;
+    // Performance optimization: Accumulate PAYE tax, chargeable income, and
+    // summary rows in a single pass over payeBandAllocations instead of running
+    // 4 separate .reduce() and .map() array iterations during real-time typing.
+    let paye = 0;
+    let taxableIncomeAtChargeableRates = 0;
+    const taxableBandRows: Array<{
+        key: string;
+        label: string;
+        detail: string;
+        annualAmount: number;
+        tone: 'muted';
+    }> = [];
+    const payeBandTaxRows: Array<{
+        key: string;
+        label: string;
+        detail: string;
+        annualAmount: number;
+        tone: 'muted';
+    }> = [];
+
+    if (!isMinimumWageExempt) {
+        for (const allocation of payeBandAllocations) {
+            paye += allocation.taxAmount;
+            if (allocation.rate > 0) {
+                taxableIncomeAtChargeableRates += allocation.taxableAmount;
             }
 
-            return total + allocation.taxableAmount;
-        },
-        0,
-    );
-    const taxableBandRows = payeBandAllocations.map((allocation) => ({
-        key: `paye_taxable_band_${allocation.index + 1}`,
-        label: `PAYE band ${allocation.index + 1} taxable income`,
-        detail: `${formatBandScope(allocation.index, allocation.lowerBound, allocation.cap)} at ${formatRate(allocation.rate)}`,
-        annualAmount: allocation.taxableAmount,
-        tone: 'muted' as const,
-    }));
-    const payeBandTaxRows = payeBandAllocations.map((allocation) => ({
-        key: `paye_tax_band_${allocation.index + 1}`,
-        label: `PAYE band ${allocation.index + 1} tax`,
-        detail: `${formatRate(allocation.rate)} on ${formatNaira(allocation.taxableAmount)}`,
-        annualAmount: -allocation.taxAmount,
-        tone: 'muted' as const,
-    }));
+            taxableBandRows.push({
+                key: `paye_taxable_band_${allocation.index + 1}`,
+                label: `PAYE band ${allocation.index + 1} taxable income`,
+                detail: `${formatBandScope(allocation.index, allocation.lowerBound, allocation.cap)} at ${formatRate(allocation.rate)}`,
+                annualAmount: allocation.taxableAmount,
+                tone: 'muted' as const,
+            });
+
+            payeBandTaxRows.push({
+                key: `paye_tax_band_${allocation.index + 1}`,
+                label: `PAYE band ${allocation.index + 1} tax`,
+                detail: `${formatRate(allocation.rate)} on ${formatNaira(allocation.taxableAmount)}`,
+                annualAmount: -allocation.taxAmount,
+                tone: 'muted' as const,
+            });
+        }
+    }
+
+    const netPay = grossEmolument - deductibleLines - paye;
 
     return {
         mode: 'employee_paye',

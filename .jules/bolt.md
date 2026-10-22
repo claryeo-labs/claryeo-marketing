@@ -42,3 +42,7 @@
 ## 2026-11-10 - Memoization of Heavy Presentation Components with Canvas/Observer Subtrees
 **Learning:** Shared presentation components such as `SiteCta` render heavy child elements like `AtmosphereCanvas`, which set up Canvas 2D contexts, `ResizeObserver`, `IntersectionObserver`, and GSAP animation tweens. Unmemoized, these components re-render and re-evaluate child hooks whenever parent page islands re-render (even with unchanged props).
 **Action:** Wrap shared, prop-driven closing CTA or banner components containing animated canvas or observer subtrees in `React.memo()` to isolate them from parent component re-renders.
+
+## 2026-11-20 - Single-Pass Aggregation for Interactive Calculation Engine Arrays
+**Learning:** Real-time calculation functions (such as `calculateEmployeePaye` and `calculateBusinessTax`) executed multiple separate `.reduce()` and `.map()` iterations over progressive tax band allocations on every input keystroke. Consolidating total tax summation, chargeable income calculation, and summary row construction into a single `for...of` loop pass eliminates redundant array allocations and traversals during interactive UI updates.
+**Action:** Consolidate multiple sequential array reductions and transformations into a single loop pass when calculating derived metrics in high-frequency interactive calculation engines.
