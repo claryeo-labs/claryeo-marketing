@@ -209,4 +209,15 @@ class WaitlistProxyTest extends TestCase
         $response->assertStatus(503)->assertExactJson(['detail' => 'Down for a moment.']);
         $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
     }
+
+    public function test_community_is_throttled(): void
+    {
+        Http::fake(['web.test/api/internal/waitlist/community' => Http::response(['total' => 0])]);
+
+        foreach (range(1, 60) as $_) {
+            $this->getJson('/waitlist/community')->assertOk();
+        }
+
+        $this->getJson('/waitlist/community')->assertStatus(429);
+    }
 }
