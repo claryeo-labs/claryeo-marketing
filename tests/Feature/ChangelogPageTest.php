@@ -90,6 +90,15 @@ class ChangelogPageTest extends TestCase
         $this->get('/changelog/2026-01-01-release-0')->assertNotFound();
     }
 
+    public function test_oversized_or_malformed_slug_in_changelog_show_is_not_found(): void
+    {
+        $this->fakeChangelog();
+
+        $oversizedSlug = '2026-10-08-'.str_repeat('a', 150);
+        $this->get('/changelog/'.$oversizedSlug)->assertNotFound();
+        $this->get('/changelog/invalid-slug-format')->assertNotFound();
+    }
+
     public function test_rss_feed_lists_releases(): void
     {
         $this->fakeChangelog();
