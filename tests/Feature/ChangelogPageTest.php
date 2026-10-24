@@ -88,6 +88,7 @@ class ChangelogPageTest extends TestCase
 
         $this->get('/changelog/2026-10-08-nope')->assertNotFound();
         $this->get('/changelog/2026-01-01-release-0')->assertNotFound();
+        $this->get('/changelog/2026-10-08-'.str_repeat('a', 150))->assertNotFound();
     }
 
     public function test_rss_feed_lists_releases(): void
