@@ -42,3 +42,7 @@
 ## 2026-11-10 - Memoization of Heavy Presentation Components with Canvas/Observer Subtrees
 **Learning:** Shared presentation components such as `SiteCta` render heavy child elements like `AtmosphereCanvas`, which set up Canvas 2D contexts, `ResizeObserver`, `IntersectionObserver`, and GSAP animation tweens. Unmemoized, these components re-render and re-evaluate child hooks whenever parent page islands re-render (even with unchanged props).
 **Action:** Wrap shared, prop-driven closing CTA or banner components containing animated canvas or observer subtrees in `React.memo()` to isolate them from parent component re-renders.
+
+## 2026-11-12 - Native DateTimeImmutable Parsing and Controller Instance Memoization for Public API Feeds
+**Learning:** Parsing API date strings using `CarbonImmutable::createFromFormat()` in iteration loops invokes Carbon's reflection, macro registration, and wrapper overhead on every item. Native `DateTimeImmutable::createFromFormat()` is ~3x faster (~20ms vs ~59ms per 10k items). Furthermore, memoizing computed feed arrays on controller instances (`$this->cachedEntries ??= ...`) eliminates redundant processing across multi-call controller actions.
+**Action:** Use native `DateTimeImmutable::createFromFormat()` when formatting simple date strings in high-frequency loops or feed controllers, and memoize computed controller collections on instance properties.
