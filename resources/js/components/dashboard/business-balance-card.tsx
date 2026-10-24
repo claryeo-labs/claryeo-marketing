@@ -1,5 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
-import { type FC, useEffect, useRef, useState } from 'react';
+import { type FC, useEffect, useId, useRef, useState } from 'react';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -140,7 +140,6 @@ function EyeToggle({
             onClick={onToggle}
             className="group relative shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={visible ? 'Hide balance' : 'Show balance'}
-            aria-pressed={visible}
             aria-controls={controlsId}
             title={visible ? 'Hide balance' : 'Show balance'}
         >
@@ -194,6 +193,7 @@ const BusinessBalanceCard: FC<BusinessBalanceCardProps> = ({
     stats,
     className,
 }) => {
+    const balanceId = useId();
     const [visible, setVisible] = useState(true);
     const [animating, setAnimating] = useState(false);
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -228,7 +228,7 @@ const BusinessBalanceCard: FC<BusinessBalanceCardProps> = ({
                         {balance ? (
                             <div className="flex min-w-0 items-center gap-2.5">
                                 <span
-                                    id="business-balance-amount"
+                                    id={balanceId}
                                     className={cn(
                                         'block truncate font-mono text-4xl font-bold tracking-tight text-foreground transition-all duration-300 ease-out sm:text-5xl',
                                         animating && 'blur-[2px]',
@@ -241,12 +241,23 @@ const BusinessBalanceCard: FC<BusinessBalanceCardProps> = ({
                                             : undefined
                                     }
                                 >
-                                    {visible ? balance : HIDDEN_BALANCE}
+                                    {visible ? (
+                                        balance
+                                    ) : (
+                                        <>
+                                            <span aria-hidden="true">
+                                                {HIDDEN_BALANCE}
+                                            </span>
+                                            <span className="sr-only">
+                                                Balance hidden
+                                            </span>
+                                        </>
+                                    )}
                                 </span>
                                 <EyeToggle
                                     visible={visible}
                                     onToggle={handleToggle}
-                                    controlsId="business-balance-amount"
+                                    controlsId={balanceId}
                                 />
                             </div>
                         ) : (
