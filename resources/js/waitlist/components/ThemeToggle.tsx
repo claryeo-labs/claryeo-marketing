@@ -142,8 +142,6 @@ export const ThemeToggle = () => {
     };
 
     const Icon = ICONS[mode];
-    const nextMode = CYCLE[(CYCLE.indexOf(mode) + 1) % CYCLE.length] as ThemeMode;
-
     return (
         <button
             ref={buttonRef}
@@ -153,13 +151,10 @@ export const ThemeToggle = () => {
             data-mode={mode}
             onClick={cycle}
             title={`Theme: ${LABELS[mode]}`}
-            aria-label={`Theme: ${LABELS[mode]}. Switch to ${LABELS[nextMode]}`}
+            aria-label={`Theme: ${LABELS[mode]}. Switch to ${LABELS[CYCLE[(CYCLE.indexOf(mode) + 1) % CYCLE.length] as ThemeMode]}`}
         >
             <span ref={iconRef} className="theme-toggle-icon">
                 <Icon size={17} />
-            </span>
-            <span className="sr-only" aria-live="polite">
-                {`Theme changed to ${LABELS[mode]}`}
             </span>
         </button>
     );
