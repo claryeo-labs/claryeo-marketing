@@ -51,43 +51,31 @@ class AppServiceProvider extends ServiceProvider
         $nav = Config::array('marketing_nav');
 
         // Features mega-menu, built from the individual feature pages.
-        // Performance optimization: Static memoization and direct array looping avoid
-        // instantiating multiple Illuminate\Support\Collection objects and closure wrappers
-        // on every HTTP request boot pass.
-        /** @var array{lead: array{label: string, href: string}, items: list<array<string, mixed>>}|null $cachedFeatures */
-        static $cachedFeatures = null;
-
-        if ($cachedFeatures === null) {
-            /** @var array<string, array<string, mixed>> $featurePages */
-            $featurePages = Config::array('feature_pages', []);
-            $featureItems = [];
-
-            foreach ($featurePages as $f) {
-                /** @var array<string, mixed> $f */
-                $title = is_string($f['title'] ?? null) ? $f['title'] : '';
-                $slug = is_string($f['slug'] ?? null) ? $f['slug'] : '';
-
-                if ($title === '' || $slug === '') {
-                    continue;
-                }
-
-                $featureItems[] = [
-                    'eyebrow' => is_string($f['eyebrow'] ?? null) ? $f['eyebrow'] : '',
-                    'title' => $title,
-                    'tagline' => is_string($f['tagline'] ?? null) ? $f['tagline'] : '',
-                    'slug' => $slug,
-                    'badge' => $f['badge'] ?? null,
-                    'href' => '/features/'.$slug,
-                ];
-            }
-
-            $cachedFeatures = [
-                'lead' => ['label' => 'All features', 'href' => '/features'],
-                'items' => $featureItems,
-            ];
-        }
-
-        $features = $cachedFeatures;
+        /** @var array<string, array<string, mixed>> $featurePages */
+        $featurePages = Config::array('feature_pages', []);
+        $str = static fn (mixed $v): string => is_string($v) ? $v : '';
+        $featureItems = collect($featurePages)
+            // Nullish reads on purpose: this runs in boot() for every request,
+            // so a feature entry missing a key degrades one menu row instead of
+            // 500-ing the whole site.
+            ->map(fn (array $f): array => [
+                'eyebrow' => $str($f['eyebrow'] ?? null),
+                'title' => $str($f['title'] ?? null),
+                'tagline' => $str($f['tagline'] ?? null),
+                'slug' => $str($f['slug'] ?? null),
+                'badge' => $f['badge'] ?? null,
+            ])
+            ->filter(fn (array $f): bool => $f['title'] !== '' && $f['slug'] !== '')
+            ->map(fn (array $f): array => [
+                ...$f,
+                'href' => '/features/'.$f['slug'],
+            ])
+            ->values()
+            ->all();
+        $features = [
+            'lead' => ['label' => 'All features', 'href' => '/features'],
+            'items' => $featureItems,
+        ];
 
         // @vitejs/plugin-react needs its dev preamble before islands.tsx loads;
         // Statamic's {{ vite }} tag doesn't emit it. Empty string in prod.

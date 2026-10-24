@@ -42,7 +42,3 @@
 ## 2026-11-10 - Memoization of Heavy Presentation Components with Canvas/Observer Subtrees
 **Learning:** Shared presentation components such as `SiteCta` render heavy child elements like `AtmosphereCanvas`, which set up Canvas 2D contexts, `ResizeObserver`, `IntersectionObserver`, and GSAP animation tweens. Unmemoized, these components re-render and re-evaluate child hooks whenever parent page islands re-render (even with unchanged props).
 **Action:** Wrap shared, prop-driven closing CTA or banner components containing animated canvas or observer subtrees in `React.memo()` to isolate them from parent component re-renders.
-
-## 2026-11-20 - Static Memoization for Application Boot Data Structures
-**Learning:** `AppServiceProvider::boot()` runs on every incoming HTTP request. Constructing navigation structure arrays using multi-pass Laravel Collection pipelines (`collect()->map()->filter()->map()->values()->all()`) allocates multiple collection objects, closure scopes, and temporary array copies per request. Replacing collection pipelines with function-static memoization (`static $cachedFeatures = null`) and direct `foreach` loops eliminates collection object overhead and prevents re-transforming static configuration array structures on every request.
-**Action:** For static configuration array processing in service providers or controller index methods, use function-static memoization and direct array loops instead of multi-pass collection pipeline transformations.

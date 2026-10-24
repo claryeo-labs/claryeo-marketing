@@ -14,41 +14,29 @@ class FeatureController extends Controller
      */
     public function index(): View
     {
-        // Performance optimization: Static memoization and direct array looping avoid
-        // re-allocating collection objects, array transformations, and closures on every request.
-        /** @var list<array<string, mixed>>|null $cachedFeatures */
-        static $cachedFeatures = null;
+        /** @var array<string, array<string, mixed>> $featurePages */
+        $featurePages = Config::array('feature_pages', []);
+        $str = static fn (mixed $v): string => is_string($v) ? $v : '';
 
-        if ($cachedFeatures === null) {
-            /** @var array<string, array<string, mixed>> $featurePages */
-            $featurePages = Config::array('feature_pages', []);
-            $features = [];
-
-            foreach ($featurePages as $f) {
-                /** @var array<string, mixed> $f */
-                $slug = is_string($f['slug'] ?? null) ? $f['slug'] : '';
-                $title = is_string($f['title'] ?? null) ? $f['title'] : '';
-
-                if ($slug === '' || $title === '') {
-                    continue;
-                }
-
-                $features[] = [
-                    'slug' => $slug,
-                    'title' => $title,
-                    'eyebrow' => is_string($f['eyebrow'] ?? null) ? $f['eyebrow'] : '',
-                    'tagline' => is_string($f['tagline'] ?? null) ? $f['tagline'] : '',
-                    'body' => is_string($f['heroParagraph'] ?? null) ? $f['heroParagraph'] : '',
-                    'highlight' => $this->firstHighlight($f['highlights'] ?? null),
-                    'badge' => $f['badge'] ?? null,
-                    'href' => '/features/'.$slug,
-                ];
-            }
-
-            $cachedFeatures = $features;
-        }
-
-        $features = $cachedFeatures;
+        // Nullish reads: a malformed config entry should drop one card, not
+        // take down /features (see AppServiceProvider::boot for the same rule).
+        $features = collect($featurePages)
+            ->map(fn (array $f): array => [
+                'slug' => $str($f['slug'] ?? null),
+                'title' => $str($f['title'] ?? null),
+                'eyebrow' => $str($f['eyebrow'] ?? null),
+                'tagline' => $str($f['tagline'] ?? null),
+                'body' => $str($f['heroParagraph'] ?? null),
+                'highlight' => $this->firstHighlight($f['highlights'] ?? null),
+                'badge' => $f['badge'] ?? null,
+            ])
+            ->filter(fn (array $f): bool => $f['slug'] !== '' && $f['title'] !== '')
+            ->map(fn (array $f): array => [
+                ...$f,
+                'href' => '/features/'.$f['slug'],
+            ])
+            ->values()
+            ->all();
 
         return view('features', [
             'title' => 'Features: Invoicing, Bank Sync & Tax Software | Claryeo',
