@@ -41,3 +41,7 @@
 ## 2026-10-16 - Radix ToggleGroup Container Accessibility Labels
 **Learning:** Radix `ToggleGroup` container controls (`role="group"` / `role="radiogroup"`) rendered without explicit `aria-label` or `aria-labelledby` attributes prevent screen reader users from hearing semantic group context when navigating option toggle choices.
 **Action:** Always provide descriptive `aria-label="..."` on `ToggleGroup` primitive components so screen readers announce group purpose alongside individual option states.
+
+## 2026-10-17 - Visibility Toggles and Masked Content Accessibility
+**Learning:** Using `aria-pressed` on a toggle button alongside dynamic `aria-label` text (e.g. "Hide balance") causes screen readers to redundantly announce "Hide balance, pressed". In addition, rendering visual bullet characters (`••••••`) when hiding content causes screen readers to read bullet characters out loud.
+**Action:** Use `useId()` for `aria-controls` targets on reusable components. For visibility toggle buttons with dynamic labels, omit `aria-pressed`. Mark bullet placeholder text as `aria-hidden="true"` and provide accessible fallback text using `<span className="sr-only">Content hidden</span>`.
