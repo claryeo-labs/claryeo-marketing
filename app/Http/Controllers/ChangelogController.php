@@ -49,10 +49,6 @@ class ChangelogController extends Controller
 
     public function show(string $slug): View
     {
-        // Security: Validate parameter length before querying entries to prevent
-        // processing arbitrarily oversized route parameters.
-        abort_if(strlen($slug) > 128, HttpResponse::HTTP_NOT_FOUND);
-
         $entries = $this->entries();
 
         // No entries at all means the main app is unreachable with nothing

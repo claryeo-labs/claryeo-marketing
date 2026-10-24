@@ -7,3 +7,8 @@
 **Vulnerability:** Global string replacement (`str_replace('://www.', '://', $url)`) on full URLs during canonical domain redirection.
 **Learning:** Operating global string replacements across full URLs (scheme + host + path + query string) mangles embedded URLs in query string parameters or paths.
 **Prevention:** Parse or slice the canonical host directly from `$request->getHost()` (e.g. `substr($host, 4)`) and construct `$target = $request->getScheme().'://'.$canonicalHost.$request->getRequestUri()` to leave path and query parameters untouched.
+
+## 2026-04-01 - Avoid Redundant In-Memory Route Parameter Length Caps
+**Vulnerability:** Attempted in-controller length cap on changelog slug route parameter.
+**Learning:** Adding redundant `strlen($slug)` caps in controller actions when route parameters are compared solely in-memory against array entries is unnecessary because Nginx caps request URI length and array comparison naturally returns 404.
+**Prevention:** Rely on route constraints or web server URI limits for read-only parameter comparisons; avoid duplicate controller checks unless parameter is forwarded to external APIs or interpolated into session/database keys.
