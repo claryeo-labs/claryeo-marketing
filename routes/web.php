@@ -107,7 +107,7 @@ Route::view('contact/thank-you', 'contact.thank-you', ['title' => 'Thank you | C
 Route::get('quiz', [WaitlistController::class, 'quiz'])->name('waitlist.quiz');
 Route::get('result', [WaitlistController::class, 'result'])->name('waitlist.result');
 Route::get('waitlist/quiz', [WaitlistController::class, 'questions'])->name('waitlist.questions');
-Route::get('waitlist/community', [WaitlistController::class, 'community'])->name('waitlist.community');
+Route::get('waitlist/community', [WaitlistController::class, 'community'])->middleware('throttle:60,1')->name('waitlist.community');
 Route::post('waitlist', [WaitlistController::class, 'store'])->middleware('throttle:6,1')->name('waitlist.store');
 
 /*
