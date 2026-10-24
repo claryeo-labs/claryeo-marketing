@@ -128,9 +128,11 @@ const HIDDEN_BALANCE = '••••••';
 function EyeToggle({
     visible,
     onToggle,
+    controlsId,
 }: {
     visible: boolean;
     onToggle: () => void;
+    controlsId?: string;
 }) {
     return (
         <button
@@ -139,6 +141,7 @@ function EyeToggle({
             className="group relative shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={visible ? 'Hide balance' : 'Show balance'}
             aria-pressed={visible}
+            aria-controls={controlsId}
             title={visible ? 'Hide balance' : 'Show balance'}
         >
             <span className="relative block h-4 w-4 overflow-hidden">
@@ -225,6 +228,7 @@ const BusinessBalanceCard: FC<BusinessBalanceCardProps> = ({
                         {balance ? (
                             <div className="flex min-w-0 items-center gap-2.5">
                                 <span
+                                    id="business-balance-amount"
                                     className={cn(
                                         'block truncate font-mono text-4xl font-bold tracking-tight text-foreground transition-all duration-300 ease-out sm:text-5xl',
                                         animating && 'blur-[2px]',
@@ -242,6 +246,7 @@ const BusinessBalanceCard: FC<BusinessBalanceCardProps> = ({
                                 <EyeToggle
                                     visible={visible}
                                     onToggle={handleToggle}
+                                    controlsId="business-balance-amount"
                                 />
                             </div>
                         ) : (
