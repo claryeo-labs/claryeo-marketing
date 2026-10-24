@@ -532,27 +532,39 @@ const PlanComparisonMatrix: FC<PlanComparisonMatrixProps> = ({
 
     return (
         <div className={cn('rounded-2xl bg-card/40', className)}>
-            <div className="flex flex-col gap-3 border-b border-border pb-5 md:hidden">
-                <label
-                    htmlFor="comparison-plan"
-                    className="text-sm font-medium text-muted-foreground"
-                >
-                    Change plan
-                </label>
-                <select
-                    id="comparison-plan"
-                    value={selectedPlan.key}
-                    onChange={(event) =>
-                        setSelectedPlanKey(event.target.value as PlanKey)
-                    }
-                    className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground shadow-sm"
-                >
-                    {comparisonPlans.map((plan) => (
-                        <option key={plan.key} value={plan.key}>
-                            {plan.name}
-                        </option>
-                    ))}
-                </select>
+            <div className="flex flex-col gap-4 border-b border-border pb-5 md:hidden">
+                <div className="flex flex-col gap-2">
+                    <label
+                        htmlFor="comparison-plan"
+                        className="text-sm font-medium text-muted-foreground"
+                    >
+                        Change plan
+                    </label>
+                    <select
+                        id="comparison-plan"
+                        value={selectedPlan.key}
+                        onChange={(event) =>
+                            setSelectedPlanKey(event.target.value as PlanKey)
+                        }
+                        className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground shadow-sm"
+                    >
+                        {comparisonPlans.map((plan) => (
+                            <option key={plan.key} value={plan.key}>
+                                {plan.name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                {onBillingChange && (
+                    <div className="flex justify-center">
+                        <BillingIntervalToggle
+                            value={billing}
+                            onChange={onBillingChange}
+                            savePercent={savePercent}
+                            compact
+                        />
+                    </div>
+                )}
             </div>
 
             <div className="hidden md:block">
